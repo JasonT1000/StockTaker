@@ -20,6 +20,8 @@ import { StockItem } from './types';
 
 function App(){
   const [inputText, SetInputText] = useState('')
+  const [errorText, SetErrorText] = useState('');
+
   const [isEditing, SetIsEditing] = useState(false)
   const [stockItems, SetStockItems] = useState([
     {stockCode: 'bob', quantity: 1, key: '1'},
@@ -42,6 +44,11 @@ function App(){
     {stockCode: 'nicky', quantity: 14, key: '18'},
   ])
 
+  const ErrorMessage = Object.freeze({
+    Short: 'That stockcode is not long enough',
+    Illegal: 'Illegal stockcode detected'
+});
+
   const toggleEditing = (canEdit:boolean) =>{
     SetIsEditing(canEdit)
   }
@@ -54,10 +61,22 @@ function App(){
     const regex = /^[^!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s]*[\w/+]{4,}[^!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s_]*$/;
 
     if(regex.test(string)){
-        return true;
+      SetErrorText('')
+      return true;
     }
 
+    handleErrorText(string)
+
     return false;
+  }
+
+  const handleErrorText = (string:string) => {
+    const regex = /^.{0,3}$/;
+    SetErrorText(ErrorMessage.Illegal)
+
+    if(regex.test(string)){
+      SetErrorText(ErrorMessage.Short)
+    }
   }
 
   const addStockItem = (newStockCode:string) => {
@@ -103,6 +122,7 @@ function App(){
         value={inputText}
         onChangeText={SetInputText}
         onSubmitEditing={(submitEvent) => handleStockInputComponentSubmitEvent(submitEvent)} />
+        {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
       <View style={styles.mainContentContainer}>
         <View style = {styles.listRow}>
           <Text style={styles.rowHeading}>ItemCode</Text>
