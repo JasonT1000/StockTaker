@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   StyleSheet,
@@ -12,16 +12,27 @@ import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons/faFloppyDisk'
 import { faFileImport } from '@fortawesome/free-solid-svg-icons/faFileImport'
 import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode'
 
-function Header()
+function Header({toggleEditing}:any)
 {
+    const [isEditing, SetIsEditing] = useState(false)
+
+    // Toggle editing on and off
+    useEffect(() => {
+        console.log("toggling Editing mode")
+        toggleEditing(isEditing)
+    }, [isEditing]);
+
+    const editStockStockItems = () => {
+        console.log("editing stock items")
+        SetIsEditing(prevState => !prevState)
+    }
+
+    // Other header functions
     const loadCSV = () =>{
         console.log("Loading CSV")
     }
     const saveCSV = () =>{
         console.log("Saving CSV")
-    }
-    const editStockQuantity = () =>{
-        console.log("Editing stock quantities")
     }
     const openBarcodeScanner = () =>{
         console.log("Loading barcode scanner")
@@ -43,7 +54,7 @@ function Header()
                     color='green'
                 />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButtons} onPress={editStockQuantity}>
+            <TouchableOpacity style={styles.iconButtons} onPress={editStockStockItems}>
                 <FontAwesomeIcon
                     icon={faPenToSquare}
                     size={32}
