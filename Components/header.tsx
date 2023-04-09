@@ -12,7 +12,12 @@ import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons/faFloppyDisk'
 import { faFileImport } from '@fortawesome/free-solid-svg-icons/faFileImport'
 import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode'
 
-function Header({toggleEditing}:any)
+interface Props {
+    toggleEditing:any
+    openBarcodeScanner:any
+  }
+
+function Header({toggleEditing, openBarcodeScanner}:Props)
 {
     const [isEditing, SetIsEditing] = useState(false)
 
@@ -34,8 +39,9 @@ function Header({toggleEditing}:any)
     const saveCSV = () =>{
         console.log("Saving CSV")
     }
-    const openBarcodeScanner = () =>{
-        console.log("Loading barcode scanner")
+    const barcodeScannerPressHandler = () =>{
+        console.log("Loading barcode scanner 1")
+        openBarcodeScanner()
     }
 
     return(
@@ -46,6 +52,7 @@ function Header({toggleEditing}:any)
                     size={32}
                     color='blue'
                 />
+                <Text style={styles.buttonText}>Load</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButtons} onPress={saveCSV}>
                 <FontAwesomeIcon
@@ -53,13 +60,15 @@ function Header({toggleEditing}:any)
                     size={32}
                     color='green'
                 />
+                <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButtons} onPress={editStockStockItems}>
                 <FontAwesomeIcon
                     icon={faPenToSquare}
                     size={32}
-                    color='orange'
+                    color='coral'
                 />
+                <Text style={styles.buttonText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButtons} onPress={openBarcodeScanner}>
                 <FontAwesomeIcon
@@ -67,6 +76,7 @@ function Header({toggleEditing}:any)
                     size={32}
                     color='navy'
                 />
+                <Text style={styles.buttonText}>Scanner</Text>
             </TouchableOpacity>
         </View>
     )
@@ -74,16 +84,19 @@ function Header({toggleEditing}:any)
 
 const styles = StyleSheet.create({
     header:{
-        backgroundColor: 'coral',
+        backgroundColor: 'white',
         flexDirection: 'row',
-        height: 50,
+        height: 60,
         borderRadius: 5
     },
     iconButtons:{
         padding: 5,
         flex: 1,
         alignItems: 'center'
-    }
+    },
+    buttonText:{
+        color: 'black',
+    },
 })
 
 export default Header

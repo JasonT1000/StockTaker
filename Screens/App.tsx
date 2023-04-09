@@ -13,12 +13,12 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Header from "./Components/header";
-import StockItemRow from './Components/stockItemRow';
-import { StockItem } from './types';
+import Header from "../Components/header";
+import StockItemRow from '../Components/stockItemRow';
+import { StockItem } from '../types';
 
 
-function App(){
+function App({navigation}:any){
   const [inputText, SetInputText] = useState('')
   const [errorText, SetErrorText] = useState('')
 
@@ -50,7 +50,7 @@ function App(){
   const ErrorMessage = Object.freeze({
     Short: 'That stockcode is not long enough',
     Illegal: 'Illegal stockcode detected'
-});
+  });
 
   const toggleEditing = (canEdit:boolean) =>{
     SetIsEditing(canEdit)
@@ -123,10 +123,14 @@ function App(){
     })
   }
 
+  const openBarcodeScanner = () =>{
+    console.log("Loading barcode scanner 2")
+    navigation.navigate('BarcodeScanner')
+  }
+
   return (
     <View style={styles.mainContainer}>
-      <Header toggleEditing={toggleEditing}/>
-      <Text>StockTake</Text>
+      <Header toggleEditing={toggleEditing} openBarcodeScanner={openBarcodeScanner}/>
       <TextInput 
         style={styles.stockCodeInput}
         placeholder='Stockcode here'
@@ -158,6 +162,7 @@ function App(){
 const styles = StyleSheet.create({
 
   mainContainer:{
+    backgroundColor: 'black',
     flex: 1,
   },
   mainContentContainer:{
