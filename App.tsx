@@ -20,29 +20,32 @@ import { StockItem } from './types';
 
 function App(){
   const [inputText, SetInputText] = useState('')
-  const [errorText, SetErrorText] = useState('');
+  const [errorText, SetErrorText] = useState('')
 
   const [isEditing, SetIsEditing] = useState(false)
   const [stockItems, SetStockItems] = useState([
-    {stockCode: 'bob', quantity: 1, key: '1'},
-    {stockCode: 'job', quantity: 4, key: '2'},
-    {stockCode: 'henry', quantity: 7, key: '3'},
-    {stockCode: 'skey', quantity: 1, key: '4'},
-    {stockCode: 'marley', quantity: 2, key: '5'},
-    {stockCode: 'nicky', quantity: 14, key: '6'},
-    {stockCode: 'bob', quantity: 1, key: '7'},
-    {stockCode: 'job', quantity: 4, key: '8'},
-    {stockCode: 'henry', quantity: 7, key: '9'},
-    {stockCode: 'skey', quantity: 1, key: '10'},
-    {stockCode: 'marley', quantity: 2, key: '11'},
-    {stockCode: 'nicky', quantity: 14, key: '12'},
-    {stockCode: 'bob', quantity: 1, key: '13'},
-    {stockCode: 'job', quantity: 4, key: '14'},
-    {stockCode: 'henry', quantity: 7, key: '15'},
-    {stockCode: 'skey', quantity: 1, key: '16'},
-    {stockCode: 'marley', quantity: 2, key: '17'},
-    {stockCode: 'nicky', quantity: 14, key: '18'},
+    {stockCode: 'bobla', quantity: 1, id: 0},
+    {stockCode: 'joblin', quantity: 4, id: 1},
+    {stockCode: 'henry', quantity: 7, id: 2},
+    {stockCode: 'siddy', quantity: 1, id: 3},
+    {stockCode: 'marley', quantity: 2, id: 4},
+    {stockCode: 'nicky', quantity: 14, id: 5},
+    {stockCode: 'bobby', quantity: 1, id: 6},
+    {stockCode: 'jobby', quantity: 4, id: 7},
+    {stockCode: 'henry', quantity: 7, id: 8},
+    {stockCode: 'siden', quantity: 1, id: 9},
+    {stockCode: 'marley', quantity: 2, id: 10},
+    {stockCode: 'nicky', quantity: 14, id: 11},
+    {stockCode: 'bobbette', quantity: 1, id: 12},
+    {stockCode: 'jobette', quantity: 4, id: 13},
+    {stockCode: 'henry', quantity: 7, id: 14},
+    {stockCode: 'sidney', quantity: 1, id: 15},
+    {stockCode: 'marley', quantity: 2, id: 16},
+    {stockCode: 'nicky', quantity: 14, id: 17},
   ])
+  // const [stockItems, SetStockItems] = useState([
+  //   {stockCode: 'bob', quantity: 1, id: 0},
+  // ])
 
   const ErrorMessage = Object.freeze({
     Short: 'That stockcode is not long enough',
@@ -80,37 +83,45 @@ function App(){
   }
 
   const addStockItem = (newStockCode:string) => {
-    if(isValidInput(newStockCode)){
-      SetStockItems([...stockItems, {stockCode: newStockCode, quantity: 1, key: (stockItems.length+1).toString()}])
-      SetInputText('')
+    if(isValidInput(newStockCode))
+    {
+      let index = stockItems.findIndex(stockItems => stockItems.stockCode === newStockCode)
+      if(index == -1){ // Item NOT in the stockItems
+        SetStockItems([...stockItems, {stockCode: newStockCode, quantity: 1, id: (Math.max(...stockItems.map((item) => item.id))+1)}])
+        SetInputText('')
+      }
+      else{ // Add 1 to the existing stockItems quantity
+        const newArray = stockItems.map((item) => {
+          if (item.stockCode === newStockCode) {
+            return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
+          }
+          return item;
+        });
+        SetStockItems(newArray);
+      }
     }
-    
-    // SetStockItems((prevStockItems) => {
-    //   return [{stockCode: newStockCode, quantity: 1, key: (prevStockItems.length+1).toString()}, ...prevStockItems]
-    // })
   }
 
-  const updateItem = (key:string, newQuantity:number) => {
+  const updateItem = (id:number, newQuantity:number) => {
     console.log("Updated an item")
-    let index = stockItems.findIndex(stockItems => stockItems.key === key)
+    let index = stockItems.findIndex(stockItems => stockItems.id === id)
     let newArray = [...stockItems];
     newArray[index].quantity = newQuantity;
     SetStockItems(newArray);
   }
 
-  const getItemQuantity = (key:string):string => {
-    let index = stockItems.findIndex(stockItems => stockItems.key === key)
-    return stockItems[index].quantity.toString()
-  }
+  // const getItemQuantity = (id:string):string => {
+  //   let index = stockItems.findIndex(stockItems => stockItems.id === id)
+  //   return stockItems[index].quantity.toString()
+  // }
 
-  const deleteStockItem = (key:string) => {
+  const deleteStockItem = (id:number) => {
     // Will need a modal to check if user is sure they want to delete an item
     console.log("Deleting a stock item")
     SetStockItems((prevStockItems) => {
-      return prevStockItems.filter(stockItem => stockItem.key != key)
+      return prevStockItems.filter(stockItem => stockItem.id != id)
     })
   }
-
 
   return (
     <View style={styles.mainContainer}>
@@ -131,8 +142,9 @@ function App(){
         </View>
         <View style={styles.listContainer}>
           <FlatList
-            // keyExtractor={(item)=> item.key}
+            keyExtractor={(item)=> item.id.toString()}
             data={stockItems}
+            removeClippedSubviews={false}
             renderItem={({ item }) => (
               <StockItemRow item={item} isEditing={isEditing} updateItem={updateItem} deleteStockItem={deleteStockItem}/>
             )}

@@ -29,9 +29,11 @@ function StockItemRow({item, isEditing, updateItem, deleteStockItem}:Props){
 
   const [inputText, SetInputText] = useState('')
 
-  const handleStockInputComponentSubmitEvent = (event:any, itemKey:string) =>{
-    updateItem(itemKey, Number(event.nativeEvent.text))
-    SetInputText('')
+  const handleStockInputComponentSubmitEvent = (event:any, itemId:number) =>{
+    if(event.nativeEvent.text != ''){
+      updateItem(itemId, Number(event.nativeEvent.text))
+      SetInputText('')
+    }
   }
 
   return (
@@ -43,9 +45,9 @@ function StockItemRow({item, isEditing, updateItem, deleteStockItem}:Props){
         inputMode ='numeric'
         value={inputText}
         onChangeText={SetInputText}
-        onSubmitEditing={submitEvent => handleStockInputComponentSubmitEvent(submitEvent, item.key)}
+        onSubmitEditing={submitEvent => handleStockInputComponentSubmitEvent(submitEvent, item.id)}
       />}
-      {isEditing && <TouchableOpacity style={[styles.rowItem, styles.deleteButton]} onPress={() => deleteStockItem(item.key)}>
+      {isEditing && <TouchableOpacity style={[styles.rowItem, styles.deleteButton]} onPress={() => deleteStockItem(item.id)}>
         <FontAwesomeIcon
             icon={faTrash}
             size={24}
