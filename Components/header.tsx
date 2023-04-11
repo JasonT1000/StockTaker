@@ -39,10 +39,10 @@ function Header({toggleEditing, openBarcodeScanner}:Props)
     const saveCSV = () =>{
         console.log("Saving CSV")
     }
-    const barcodeScannerPressHandler = () =>{
-        console.log("Loading barcode scanner 1")
-        openBarcodeScanner()
-    }
+    // const barcodeScannerPressHandler = () =>{
+    //     console.log("Loading barcode scanner 1")
+    //     openBarcodeScanner()
+    // }
 
     return(
         <View style={styles.header}>

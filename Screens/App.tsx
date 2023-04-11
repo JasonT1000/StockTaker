@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import Header from "../Components/header";
 import StockItemRow from '../Components/stockItemRow';
-import { StockItem } from '../types';
 
 
 function App({navigation}:any){
@@ -125,7 +124,8 @@ function App({navigation}:any){
 
   const openBarcodeScanner = () =>{
     console.log("Loading barcode scanner 2")
-    navigation.navigate('BarcodeScanner')
+    // navigation.navigate('BarcodeScanner')
+    navigation.navigate('TestScreen')
   }
 
   return (

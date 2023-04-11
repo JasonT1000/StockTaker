@@ -18,6 +18,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import App from './Screens/App';
 import BarcodeScanner from './Screens/BarcodeScanner';
+import TestScreen from './Screens/TestScreen';
 
 const Stack = createNativeStackNavigator()
 
@@ -30,6 +31,9 @@ function BaseApp(){
         />
         <Stack.Screen
           name='BarcodeScanner' component={BarcodeScanner}
+        />
+        <Stack.Screen
+          name='TestScreen' component={TestScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
