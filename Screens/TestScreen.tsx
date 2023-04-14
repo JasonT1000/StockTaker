@@ -18,28 +18,28 @@ function TestScreen({navigation}:any)
 {
   const {state, dispatch} = useContext(AppContext)
 
+  useEffect(() => {
+    console.log("Something happened")
+    console.log(state.stockItems)
+  }, [state.stockItems]);
+
   const handlePress = (name:string) =>{
     dispatch({
       type: Types.Add,
       payload: {
-        stockCode: 'Jimmies',
+        stockCode: name,
         quantity: 4,
         id: 20,
       }
     })
-
-    console.log("current stock items are")
-    console.log(state.stockItems)
   }
 
   return (
-    <AppProvider>
       <View>
         <Text>Stuff happening</Text>
         <Button title="+" onPress={() => {handlePress('jimmBoy')}} />
         <Button title="-" onPress={() => {handlePress('HenryHigglet')}} />
       </View>
-    </AppProvider>
   )
 
 }

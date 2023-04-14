@@ -19,23 +19,26 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import App from './Screens/App';
 import BarcodeScanner from './Screens/BarcodeScanner';
 import TestScreen from './Screens/TestScreen';
+import { AppProvider } from './Store/stockItemContext';
 
 const Stack = createNativeStackNavigator()
 
 function BaseApp(){
   return(
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen
-          name='Home' component={App}
-        />
-        <Stack.Screen
-          name='BarcodeScanner' component={BarcodeScanner}
-        />
-        <Stack.Screen
-          name='TestScreen' component={TestScreen}
-        />
-      </Stack.Navigator>
+      <AppProvider>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
+          <Stack.Screen
+            name='Home' component={App}
+          />
+          <Stack.Screen
+            name='BarcodeScanner' component={BarcodeScanner}
+          />
+          <Stack.Screen
+            name='TestScreen' component={TestScreen}
+          />
+        </Stack.Navigator>
+      </AppProvider>
     </NavigationContainer>
   )
 }
