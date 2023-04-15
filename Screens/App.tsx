@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -15,6 +15,8 @@ import {
 } from 'react-native';
 import Header from "../Components/header";
 import StockItemRow from '../Components/stockItemRow';
+import { AppContext } from '../Store/stockItemContext';
+import { Types } from '../Store/reducers';
 
 
 function App({navigation}:any){
@@ -22,28 +24,26 @@ function App({navigation}:any){
   const [errorText, SetErrorText] = useState('')
 
   const [isEditing, SetIsEditing] = useState(false)
-  const [stockItems, SetStockItems] = useState([
-    {stockCode: 'bobla', quantity: 1, id: 0},
-    {stockCode: 'joblin', quantity: 4, id: 1},
-    {stockCode: 'henry', quantity: 7, id: 2},
-    {stockCode: 'siddy', quantity: 1, id: 3},
-    {stockCode: 'marley', quantity: 2, id: 4},
-    {stockCode: 'nicky', quantity: 14, id: 5},
-    {stockCode: 'bobby', quantity: 1, id: 6},
-    {stockCode: 'jobby', quantity: 4, id: 7},
-    {stockCode: 'henry', quantity: 7, id: 8},
-    {stockCode: 'siden', quantity: 1, id: 9},
-    {stockCode: 'marley', quantity: 2, id: 10},
-    {stockCode: 'nicky', quantity: 14, id: 11},
-    {stockCode: 'bobbette', quantity: 1, id: 12},
-    {stockCode: 'jobette', quantity: 4, id: 13},
-    {stockCode: 'henry', quantity: 7, id: 14},
-    {stockCode: 'sidney', quantity: 1, id: 15},
-    {stockCode: 'marley', quantity: 2, id: 16},
-    {stockCode: 'nicky', quantity: 14, id: 17},
-  ])
+  const {state, dispatch} = useContext(AppContext)
   // const [stockItems, SetStockItems] = useState([
-  //   {stockCode: 'bob', quantity: 1, id: 0},
+  //   {stockCode: 'bobla', quantity: 1, id: 0},
+  //   {stockCode: 'joblin', quantity: 4, id: 1},
+  //   {stockCode: 'henry', quantity: 7, id: 2},
+  //   {stockCode: 'siddy', quantity: 1, id: 3},
+  //   {stockCode: 'marley', quantity: 2, id: 4},
+  //   {stockCode: 'nicky', quantity: 14, id: 5},
+  //   {stockCode: 'bobby', quantity: 1, id: 6},
+  //   {stockCode: 'jobby', quantity: 4, id: 7},
+  //   {stockCode: 'henry', quantity: 7, id: 8},
+  //   {stockCode: 'siden', quantity: 1, id: 9},
+  //   {stockCode: 'marley', quantity: 2, id: 10},
+  //   {stockCode: 'nicky', quantity: 14, id: 11},
+  //   {stockCode: 'bobbette', quantity: 1, id: 12},
+  //   {stockCode: 'jobette', quantity: 4, id: 13},
+  //   {stockCode: 'henry', quantity: 7, id: 14},
+  //   {stockCode: 'sidney', quantity: 1, id: 15},
+  //   {stockCode: 'marley', quantity: 2, id: 16},
+  //   {stockCode: 'nicky', quantity: 14, id: 17},
   // ])
 
   const ErrorMessage = Object.freeze({
@@ -84,29 +84,45 @@ function App({navigation}:any){
   const addStockItem = (newStockCode:string) => {
     if(isValidInput(newStockCode))
     {
-      let index = stockItems.findIndex(stockItems => stockItems.stockCode === newStockCode)
-      if(index == -1){ // Item NOT in the stockItems
-        SetStockItems([...stockItems, {stockCode: newStockCode, quantity: 1, id: (Math.max(...stockItems.map((item) => item.id))+1)}])
-        SetInputText('')
-      }
-      else{ // Add 1 to the existing stockItems quantity
-        const newArray = stockItems.map((item) => {
-          if (item.stockCode === newStockCode) {
-            return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
-          }
-          return item;
-        });
-        SetStockItems(newArray);
-      }
+      dispatch({
+        type: Types.Add,
+        payload: {
+          stockCode: newStockCode,
+          quantity: 44,
+          id: 44,
+        }
+      })
+      SetInputText('')
+      // let index = stockItems.findIndex(stockItems => stockItems.stockCode === newStockCode)
+      // if(index == -1){ // Item NOT in the stockItems
+      //   SetStockItems([...stockItems, {stockCode: newStockCode, quantity: 1, id: (Math.max(...stockItems.map((item) => item.id))+1)}])
+      //   SetInputText('')
+      // }
+      // else{ // Add 1 to the existing stockItems quantity
+      //   const newArray = stockItems.map((item) => {
+      //     if (item.stockCode === newStockCode) {
+      //       return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
+      //     }
+      //     return item;
+      //   });
+      //   SetStockItems(newArray);
+      // }
     }
   }
 
   const updateItem = (id:number, newQuantity:number) => {
-    console.log("Updated an item")
-    let index = stockItems.findIndex(stockItems => stockItems.id === id)
-    let newArray = [...stockItems];
-    newArray[index].quantity = newQuantity;
-    SetStockItems(newArray);
+    dispatch({
+      type: Types.Update,
+      payload: {
+        quantity: newQuantity,
+        id: id,
+      }
+    })
+    // console.log("Updated an item")
+    // let index = stockItems.findIndex(stockItems => stockItems.id === id)
+    // let newArray = [...stockItems];
+    // newArray[index].quantity = newQuantity;
+    // SetStockItems(newArray);
   }
 
   // const getItemQuantity = (id:string):string => {
@@ -117,15 +133,19 @@ function App({navigation}:any){
   const deleteStockItem = (id:number) => {
     // Will need a modal to check if user is sure they want to delete an item
     console.log("Deleting a stock item")
-    SetStockItems((prevStockItems) => {
-      return prevStockItems.filter(stockItem => stockItem.id != id)
+    dispatch({
+      type: Types.Delete,
+      payload: { id: id }
     })
+    // SetStockItems((prevStockItems) => {
+    //   return prevStockItems.filter(stockItem => stockItem.id != id)
+    // })
   }
 
   const openBarcodeScanner = () =>{
     console.log("Loading barcode scanner 2")
-    // navigation.navigate('BarcodeScanner')
-    navigation.navigate('TestScreen')
+    navigation.navigate('BarcodeScanner')
+    // navigation.navigate('TestScreen')
   }
 
   return (
@@ -147,7 +167,7 @@ function App({navigation}:any){
         <View style={styles.listContainer}>
           <FlatList
             keyExtractor={(item)=> item.id.toString()}
-            data={stockItems}
+            data={state.stockItems}
             removeClippedSubviews={false}
             renderItem={({ item }) => (
               <StockItemRow item={item} isEditing={isEditing} updateItem={updateItem} deleteStockItem={deleteStockItem}/>

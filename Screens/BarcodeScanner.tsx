@@ -5,8 +5,9 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
+  Alert,
   Button,
   StyleSheet,
   Text,
@@ -14,12 +15,15 @@ import {
 } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
+import { AppContext } from '../Store/stockItemContext';
+import { Types } from '../Store/reducers';
 
 
 
 function BarcodeScanner({navigation}:any){
-  const [data, Setdata] = useState('')
-  const [itemQuantity, SetItemQuantity] = useState(0)
+  const [currentItemCode, SetCurrentItemCode] = useState('')
+  const {state, dispatch} = useContext(AppContext)
+  const [CurrentItemQuantity, SetCurrentItemQuantity] = useState(0)
   const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.torch)
 
   const TorchMode = Object.freeze({
@@ -27,17 +31,27 @@ function BarcodeScanner({navigation}:any){
     OFF: RNCamera.Constants.FlashMode.off
   });
 
-  const updateData = (stockCode:string) => {
-    if(stockCode === data){
-      SetItemQuantity(itemQuantity+1)
-    }
-    else{
-      Setdata(stockCode)
-      SetItemQuantity(1)
-    }
+  useEffect(() => {
+    const updatedItem = state.stockItems.find(stockItem => stockItem.stockCode === currentItemCode)
+
+    SetCurrentItemQuantity(updatedItem.quantity)
+
+  }, [state.stockItems]);
+
+  const addStockItem = (newStockCode:string) => {
+      dispatch({
+        type: Types.Add,
+        payload: {
+          stockCode: newStockCode,
+          quantity: 44,
+          id: 44,
+        }
+      })
+
+      SetCurrentItemCode(newStockCode)
   }
 
-  const clickHandler = () => {
+  const reactivateScanner = () => {
     this.scanner.reactivate()
   }
 
@@ -53,7 +67,7 @@ function BarcodeScanner({navigation}:any){
   return (
     <View style={styles.container}>
       <QRCodeScanner
-        onRead={({data}) => updateData(data)}
+        onRead={({data}) => addStockItem(data)}
         flashMode={torchMode}
         // reactivate = {canScan}
         // reactivateTimeout={500}
@@ -63,13 +77,13 @@ function BarcodeScanner({navigation}:any){
           <View style={styles.topView}>
             <View style={styles.topViewRow}>
               <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
-              <Text style={styles.barcodeData}>{data}</Text>
+              <Text style={styles.barcodeData}>{currentItemCode}</Text>
             </View>
             
-            {itemQuantity > 0 ?
+            {CurrentItemQuantity > 0 ?
               <View style={styles.topViewRow}>
                 <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
-                <Text style={styles.barcodeData}>{itemQuantity}</Text>
+                <Text style={styles.barcodeData}>{CurrentItemQuantity}</Text>
               </View>
               : null }
           </View>
@@ -79,7 +93,7 @@ function BarcodeScanner({navigation}:any){
         // markerStyle={styles.marker}
         bottomContent={
           <View style={styles.bottomView}>
-            <Button title='scan code' onPress={clickHandler}/>
+            <Button title='scan code' onPress={reactivateScanner}/>
             <View style={styles.bottomView}>
               <Button title='Toggle Torch' onPress={torchPressHandler}/>
             </View>

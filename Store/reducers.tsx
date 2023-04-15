@@ -12,6 +12,7 @@ type ActionMap<M extends { [index: string]: any}> = {
 export enum Types {
     Add = 'ADD_STOCKITEM',
     Delete = 'DELETE_STOCKITEM',
+    Update = 'UPDATE_STOCKITEM',
 }
 
 type StockItem = {
@@ -26,6 +27,10 @@ type StockItemPayload = {
         quantity: number
         id: number
     },
+    [Types.Update] : {
+        quantity: number
+        id: number
+    },
     [Types.Delete] : {
         id:number
     }
@@ -36,14 +41,18 @@ export type StockItemActions = ActionMap<StockItemPayload>[keyof ActionMap<Stock
 export const stockItemReducer = (state: StockItem[], action: StockItemActions) => {
     switch (action.type){
         case Types.Add:
-            return[
-            ...state,
-            {
-                stockCode: action.payload.stockCode,
-                quantity: action.payload.quantity,
-                id: action.payload.id,
-            }
-            ]
+            return addStockItem(state, action.payload.stockCode)
+            // return[
+            // ...state,
+            // {
+            //     stockCode: action.payload.stockCode,
+            //     quantity: action.payload.quantity,
+            //     id: action.payload.id,
+            // }
+            // ]
+        case Types.Update:
+            return updateStockItem(state, action.payload.id, action.payload.quantity)
+
         case Types.Delete:
             return [
             ...state.filter(stockItem => stockItem.id !== action.payload.id),
@@ -51,4 +60,32 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
         default:
             return state
     }
+  }
+
+
+  const addStockItem = (state: StockItem[], newStockCode:string) => {
+    let index = state.findIndex(stockItems => stockItems.stockCode === newStockCode)
+    if(index == -1){ // Item NOT in the stockItems
+    return([...state, {stockCode: newStockCode, quantity: 1, id: (Math.max(...state.map((item) => item.id))+1)}])
+    // SetInputText('')
+    }
+    else{ // Add 1 to the existing stockItems quantity
+    const newArray = state.map((item) => {
+        if (item.stockCode === newStockCode) {
+        return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
+        }
+        return item;
+    });
+    
+    return(newArray);
+    }
+  }
+
+  const updateStockItem = (state: StockItem[], id:number, newQuantity:number) => {
+    console.log("Updated an item")
+    let index = state.findIndex(stockItems => stockItems.id === id)
+    let newArray = [...state];
+    newArray[index].quantity = newQuantity;
+    
+    return newArray
   }
