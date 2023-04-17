@@ -24,8 +24,7 @@ type StockItem = {
 type StockItemPayload = {
     [Types.Add] : {
         stockCode: string
-        quantity: number
-        id: number
+        quantity?: number
     },
     [Types.Update] : {
         quantity: number
@@ -41,7 +40,7 @@ export type StockItemActions = ActionMap<StockItemPayload>[keyof ActionMap<Stock
 export const stockItemReducer = (state: StockItem[], action: StockItemActions) => {
     switch (action.type){
         case Types.Add:
-            return addStockItem(state, action.payload.stockCode)
+            return addStockItem(state, action.payload)
             
         case Types.Update:
             return updateStockItem(state, action.payload.id, action.payload.quantity)
@@ -57,15 +56,18 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
 
   // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to 1
   // otherwise it adds one to an items existing quantity.
-  const addStockItem = (state: StockItem[], newStockCode:string) => {
-    let index = state.findIndex(stockItems => stockItems.stockCode === newStockCode)
+  const addStockItem = (state: StockItem[], payload:{stockCode:string, quantity?:number}) => {
+    let index = state.findIndex(stockItems => stockItems.stockCode === payload.stockCode)
     if(index == -1){ // Item NOT in the stockItems
-    return([...state, {stockCode: newStockCode, quantity: 1, id: (Math.max(...state.map((item) => item.id))+1)}])
+    return([...state, {
+        stockCode: payload.stockCode,
+        quantity: payload.quantity? payload.stockCode : 1,
+        id: (Math.max(...state.map((item) => item.id))+1)}])
     // SetInputText('')
     }
     else{ // Add 1 to the existing stockItems quantity
     const newArray = state.map((item) => {
-        if (item.stockCode === newStockCode) {
+        if (item.stockCode === payload.stockCode) {
         return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
         }
         return item;

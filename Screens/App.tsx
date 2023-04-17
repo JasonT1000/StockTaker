@@ -67,15 +67,14 @@ function App({navigation}:any){
     }
   }
 
-  const addStockItem = (newStockCode:string) => {
+  const addStockItem = (newStockCode:string, quantity?:number) => {
     if(isValidInput(newStockCode))
     {
       dispatch({
         type: Types.Add,
         payload: {
           stockCode: newStockCode,
-          quantity: 44,
-          id: 44,
+          quantity: quantity,
         }
       })
       SetInputText('')
@@ -126,18 +125,16 @@ function App({navigation}:any){
     const rowString = state.stockItems.map(stockItem => `${stockItem.stockCode},${stockItem.quantity}\n`).join('');
     const csvString = `${headerString}${rowString}`;
 
-    // let dir = await ScopedStorage.openDocumentTree(true);
-    if(await hasFolderPermissions()){
+    // if(await hasFolderPermissions()){
       let file = await ScopedStorage.createDocument("StockTake_2023", "text/csv", csvString);
       if(file){
         ToastAndroid.show('File saved successfully', ToastAndroid.SHORT)
       }
-    }
+    // }
   }
 
   const loadCSV = async () => {
-    // let dir = await ScopedStorage.openDocumentTree(true);
-    if(await hasFolderPermissions()){
+    // if(await hasFolderPermissions()){
       let file = await ScopedStorage.openDocument(true, 'utf8');
 
       if(file){
@@ -150,7 +147,7 @@ function App({navigation}:any){
           ToastAndroid.show('Can only load text or CSV files',ToastAndroid.LONG)
         }
       }
-    }
+    // }
   }
 
   const hasFolderPermissions = async () => {
