@@ -21,6 +21,7 @@ import Header from "../Components/header";
 import StockItemRow from '../Components/stockItemRow';
 import { AppContext } from '../Store/stockItemContext';
 import { Types } from '../Store/reducers';
+import { displayFileContents } from '../customFunctions';
 
 
 function App({navigation}:any){
@@ -138,10 +139,12 @@ function App({navigation}:any){
       let file = await ScopedStorage.openDocument(true, 'utf8');
 
       if(file){
-        if(file.mime === 'text/csv'){
+        console.log(file)
+        if(file.mime === 'text/csv' || file.mime === 'text/comma-separated-values'){
           ToastAndroid.show('File loaded successfully',ToastAndroid.SHORT)
-          // handle CSV file
-          // file.data
+          // Disable input until files loaded
+          // Display message of loading
+          displayFileContents(file.data, addStockItem)
         }
         else{
           ToastAndroid.show('Can only load text or CSV files',ToastAndroid.LONG)
