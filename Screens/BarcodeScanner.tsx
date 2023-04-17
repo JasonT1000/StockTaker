@@ -34,7 +34,7 @@ function BarcodeScanner({navigation}:any){
   useEffect(() => {
     const updatedItem = state.stockItems.find(stockItem => stockItem.stockCode === currentItemCode)
 
-    SetCurrentItemQuantity(updatedItem.quantity)
+    SetCurrentItemQuantity(updatedItem? updatedItem.quantity: 1)
 
   }, [state.stockItems]);
 

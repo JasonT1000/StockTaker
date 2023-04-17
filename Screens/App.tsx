@@ -7,12 +7,16 @@
 
 import React, { useContext, useState } from 'react';
 import {
+  Alert,
   FlatList,
   StyleSheet,
   Text,
   TextInput,
+  ToastAndroid,
   View,
 } from 'react-native';
+import ReactNativeBlobUtil from 'react-native-blob-util'
+import * as ScopedStorage from "react-native-scoped-storage"
 import Header from "../Components/header";
 import StockItemRow from '../Components/stockItemRow';
 import { AppContext } from '../Store/stockItemContext';
@@ -24,27 +28,9 @@ function App({navigation}:any){
   const [errorText, SetErrorText] = useState('')
 
   const [isEditing, SetIsEditing] = useState(false)
+  const [storeageUri, SetStorageUri] = useState('')
+
   const {state, dispatch} = useContext(AppContext)
-  // const [stockItems, SetStockItems] = useState([
-  //   {stockCode: 'bobla', quantity: 1, id: 0},
-  //   {stockCode: 'joblin', quantity: 4, id: 1},
-  //   {stockCode: 'henry', quantity: 7, id: 2},
-  //   {stockCode: 'siddy', quantity: 1, id: 3},
-  //   {stockCode: 'marley', quantity: 2, id: 4},
-  //   {stockCode: 'nicky', quantity: 14, id: 5},
-  //   {stockCode: 'bobby', quantity: 1, id: 6},
-  //   {stockCode: 'jobby', quantity: 4, id: 7},
-  //   {stockCode: 'henry', quantity: 7, id: 8},
-  //   {stockCode: 'siden', quantity: 1, id: 9},
-  //   {stockCode: 'marley', quantity: 2, id: 10},
-  //   {stockCode: 'nicky', quantity: 14, id: 11},
-  //   {stockCode: 'bobbette', quantity: 1, id: 12},
-  //   {stockCode: 'jobette', quantity: 4, id: 13},
-  //   {stockCode: 'henry', quantity: 7, id: 14},
-  //   {stockCode: 'sidney', quantity: 1, id: 15},
-  //   {stockCode: 'marley', quantity: 2, id: 16},
-  //   {stockCode: 'nicky', quantity: 14, id: 17},
-  // ])
 
   const ErrorMessage = Object.freeze({
     Short: 'That stockcode is not long enough',
@@ -118,17 +104,7 @@ function App({navigation}:any){
         id: id,
       }
     })
-    // console.log("Updated an item")
-    // let index = stockItems.findIndex(stockItems => stockItems.id === id)
-    // let newArray = [...stockItems];
-    // newArray[index].quantity = newQuantity;
-    // SetStockItems(newArray);
   }
-
-  // const getItemQuantity = (id:string):string => {
-  //   let index = stockItems.findIndex(stockItems => stockItems.id === id)
-  //   return stockItems[index].quantity.toString()
-  // }
 
   const deleteStockItem = (id:number) => {
     // Will need a modal to check if user is sure they want to delete an item
@@ -137,20 +113,62 @@ function App({navigation}:any){
       type: Types.Delete,
       payload: { id: id }
     })
-    // SetStockItems((prevStockItems) => {
-    //   return prevStockItems.filter(stockItem => stockItem.id != id)
-    // })
   }
 
   const openBarcodeScanner = () =>{
     console.log("Loading barcode scanner 2")
     navigation.navigate('BarcodeScanner')
-    // navigation.navigate('TestScreen')
+  }
+
+  const saveCSV = async () => {
+    // construct csvString
+    const headerString = 'stockcode,qty\n';
+    const rowString = state.stockItems.map(stockItem => `${stockItem.stockCode},${stockItem.quantity}\n`).join('');
+    const csvString = `${headerString}${rowString}`;
+
+    // let dir = await ScopedStorage.openDocumentTree(true);
+    if(await hasFolderPermissions()){
+      let file = await ScopedStorage.createDocument("StockTake_2023", "text/csv", csvString);
+      if(file){
+        ToastAndroid.show('File saved successfully', ToastAndroid.SHORT)
+      }
+    }
+  }
+
+  const loadCSV = async () => {
+    // let dir = await ScopedStorage.openDocumentTree(true);
+    if(await hasFolderPermissions()){
+      let file = await ScopedStorage.openDocument(true, 'utf8');
+
+      if(file){
+        if(file.mime === 'text/csv'){
+          ToastAndroid.show('File loaded successfully',ToastAndroid.SHORT)
+          // handle CSV file
+          // file.data
+        }
+        else{
+          ToastAndroid.show('Can only load text or CSV files',ToastAndroid.LONG)
+        }
+      }
+    }
+  }
+
+  const hasFolderPermissions = async () => {
+    if(storeageUri !== ''){ return true }
+
+    let dir = await ScopedStorage.openDocumentTree(true);
+    
+    if(dir){
+      SetStorageUri(dir.uri)
+      return true
+    }
+
+    return false
   }
 
   return (
     <View style={styles.mainContainer}>
-      <Header toggleEditing={toggleEditing} openBarcodeScanner={openBarcodeScanner}/>
+      <Header toggleEditing={toggleEditing} openBarcodeScanner={openBarcodeScanner} saveCSV={saveCSV} loadCSV={loadCSV}/>
       <TextInput 
         style={styles.stockCodeInput}
         placeholder='Stockcode here'

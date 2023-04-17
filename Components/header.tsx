@@ -15,9 +15,11 @@ import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode'
 interface Props {
     toggleEditing:any
     openBarcodeScanner:any
+    saveCSV:any
+    loadCSV:any
   }
 
-function Header({toggleEditing, openBarcodeScanner}:Props)
+function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV}:Props)
 {
     const [isEditing, SetIsEditing] = useState(false)
 
@@ -31,18 +33,6 @@ function Header({toggleEditing, openBarcodeScanner}:Props)
         console.log("editing stock items")
         SetIsEditing(prevState => !prevState)
     }
-
-    // Other header functions
-    const loadCSV = () =>{
-        console.log("Loading CSV")
-    }
-    const saveCSV = () =>{
-        console.log("Saving CSV")
-    }
-    // const barcodeScannerPressHandler = () =>{
-    //     console.log("Loading barcode scanner 1")
-    //     openBarcodeScanner()
-    // }
 
     return(
         <View style={styles.header}>

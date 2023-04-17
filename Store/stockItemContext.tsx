@@ -23,6 +23,14 @@ const initialState = {
     {stockCode: 'jobby', quantity: 4, id: 7},
     {stockCode: 'henry', quantity: 7, id: 8},
     {stockCode: 'siden', quantity: 1, id: 9},
+    {stockCode: 'marley', quantity: 2, id: 10},
+    {stockCode: 'nicky', quantity: 14, id: 11},
+    {stockCode: 'bobbette', quantity: 1, id: 12},
+    {stockCode: 'jobette', quantity: 4, id: 13},
+    {stockCode: 'henry', quantity: 7, id: 14},
+    {stockCode: 'sidney', quantity: 1, id: 15},
+    {stockCode: 'marley', quantity: 2, id: 16},
+    {stockCode: 'nicky', quantity: 14, id: 17},
   ]
 }
 

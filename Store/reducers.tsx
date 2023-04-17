@@ -42,14 +42,7 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
     switch (action.type){
         case Types.Add:
             return addStockItem(state, action.payload.stockCode)
-            // return[
-            // ...state,
-            // {
-            //     stockCode: action.payload.stockCode,
-            //     quantity: action.payload.quantity,
-            //     id: action.payload.id,
-            // }
-            // ]
+            
         case Types.Update:
             return updateStockItem(state, action.payload.id, action.payload.quantity)
 
@@ -62,7 +55,8 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
     }
   }
 
-
+  // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to 1
+  // otherwise it adds one to an items existing quantity.
   const addStockItem = (state: StockItem[], newStockCode:string) => {
     let index = state.findIndex(stockItems => stockItems.stockCode === newStockCode)
     if(index == -1){ // Item NOT in the stockItems
@@ -81,6 +75,7 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
     }
   }
 
+  // Updates an existing stock item with the passed in quantity.
   const updateStockItem = (state: StockItem[], id:number, newQuantity:number) => {
     console.log("Updated an item")
     let index = state.findIndex(stockItems => stockItems.id === id)
