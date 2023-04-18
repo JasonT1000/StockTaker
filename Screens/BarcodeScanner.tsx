@@ -33,8 +33,9 @@ function BarcodeScanner({navigation}:any){
 
   useEffect(() => {
     const updatedItem = state.stockItems.find(stockItem => stockItem.stockCode === currentItemCode)
-
-    SetCurrentItemQuantity(updatedItem? updatedItem.quantity: 1)
+    if(updatedItem){
+      SetCurrentItemQuantity(updatedItem? updatedItem.quantity: 1)
+    }
 
   }, [state.stockItems]);
 
@@ -42,9 +43,7 @@ function BarcodeScanner({navigation}:any){
       dispatch({
         type: Types.Add,
         payload: {
-          stockCode: newStockCode,
-          quantity: 44,
-          id: 44,
+          stockCode: newStockCode
         }
       })
 

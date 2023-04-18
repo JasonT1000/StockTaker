@@ -15,10 +15,10 @@ export enum Types {
     Update = 'UPDATE_STOCKITEM',
 }
 
-type StockItem = {
+export type StockItem = {
     stockCode:string
     quantity:number
-    id:number
+    id:string
 }
 
 type StockItemPayload = {
@@ -28,10 +28,10 @@ type StockItemPayload = {
     },
     [Types.Update] : {
         quantity: number
-        id: number
+        id: string
     },
     [Types.Delete] : {
-        id:number
+        id:string
     }
 }
 
@@ -59,26 +59,30 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
   const addStockItem = (state: StockItem[], payload:{stockCode:string, quantity?:number}) => {
     let index = state.findIndex(stockItems => stockItems.stockCode === payload.stockCode)
     if(index == -1){ // Item NOT in the stockItems
-    return([...state, {
-        stockCode: payload.stockCode,
-        quantity: payload.quantity? payload.stockCode : 1,
-        id: (Math.max(...state.map((item) => item.id))+1)}])
+        return([...state, {
+            stockCode: payload.stockCode,
+            quantity: payload.quantity? payload.quantity : 1,
+            id: payload.stockCode,
+        }])
     // SetInputText('')
     }
     else{ // Add 1 to the existing stockItems quantity
-    const newArray = state.map((item) => {
-        if (item.stockCode === payload.stockCode) {
-        return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
-        }
-        return item;
-    });
+        const newArray = state.map((item) => {
+            if (item.stockCode === payload.stockCode) {
+            return { ...item,
+                stockCode: item.stockCode,
+                quantity: (item.quantity + (payload.quantity? payload.quantity : 1)),
+                id: item.id };
+            }
+            return item;
+        });
     
-    return(newArray);
+        return(newArray);
     }
   }
 
   // Updates an existing stock item with the passed in quantity.
-  const updateStockItem = (state: StockItem[], id:number, newQuantity:number) => {
+  const updateStockItem = (state: StockItem[], id:string, newQuantity:number) => {
     console.log("Updated an item")
     let index = state.findIndex(stockItems => stockItems.id === id)
     let newArray = [...state];

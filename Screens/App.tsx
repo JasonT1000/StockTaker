@@ -7,7 +7,6 @@
 
 import React, { useContext, useState } from 'react';
 import {
-  Alert,
   FlatList,
   StyleSheet,
   Text,
@@ -15,12 +14,11 @@ import {
   ToastAndroid,
   View,
 } from 'react-native';
-import ReactNativeBlobUtil from 'react-native-blob-util'
 import * as ScopedStorage from "react-native-scoped-storage"
 import Header from "../Components/header";
 import StockItemRow from '../Components/stockItemRow';
 import { AppContext } from '../Store/stockItemContext';
-import { Types } from '../Store/reducers';
+import { Types, StockItem } from '../Store/reducers';
 import { displayFileContents } from '../customFunctions';
 
 
@@ -96,7 +94,7 @@ function App({navigation}:any){
     }
   }
 
-  const updateItem = (id:number, newQuantity:number) => {
+  const updateItem = (id:string, newQuantity:number) => {
     dispatch({
       type: Types.Update,
       payload: {
@@ -106,9 +104,8 @@ function App({navigation}:any){
     })
   }
 
-  const deleteStockItem = (id:number) => {
+  const deleteStockItem = (id:string) => {
     // Will need a modal to check if user is sure they want to delete an item
-    console.log("Deleting a stock item")
     dispatch({
       type: Types.Delete,
       payload: { id: id }
@@ -116,7 +113,6 @@ function App({navigation}:any){
   }
 
   const openBarcodeScanner = () =>{
-    console.log("Loading barcode scanner 2")
     navigation.navigate('BarcodeScanner')
   }
 
@@ -184,7 +180,7 @@ function App({navigation}:any){
         </View>
         <View style={styles.listContainer}>
           <FlatList
-            keyExtractor={(item)=> item.id.toString()}
+            // keyExtractor={(item)=> item.id}
             data={state.stockItems}
             removeClippedSubviews={false}
             renderItem={({ item }) => (
@@ -213,6 +209,7 @@ const styles = StyleSheet.create({
     borderColor: '#777',
     padding: 8,
     margin: 10,
+    color: 'white',
     // width: 200,
   },
   listRow:{
@@ -225,6 +222,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     height: 40,
     fontSize: 21,
+    color: 'white',
   },
   listContainer:{
     flex: 1,

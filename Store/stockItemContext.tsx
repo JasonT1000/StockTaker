@@ -4,7 +4,7 @@ import { StockItemActions, stockItemReducer } from './reducers';
 type StockItem = {
   stockCode:string
   quantity:number
-  id:number
+  id:string
 }
 
 type InitialStateType = {

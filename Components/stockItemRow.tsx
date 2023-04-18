@@ -15,7 +15,8 @@ import {
 } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash'
-import { StockItem } from '../types';
+import { StockItem } from '../Store/reducers';
+
 
 interface Props {
   item:StockItem
@@ -29,7 +30,7 @@ function StockItemRow({item, isEditing, updateItem, deleteStockItem}:Props){
 
   const [inputText, SetInputText] = useState('')
 
-  const handleStockInputComponentSubmitEvent = (event:any, itemId:number) =>{
+  const handleStockInputComponentSubmitEvent = (event:any, itemId:string) =>{
     if(event.nativeEvent.text != ''){
       updateItem(itemId, Number(event.nativeEvent.text))
       SetInputText('')
@@ -68,6 +69,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginTop: 18,
     textAlign: 'center',
+    color: 'white',
   },
   rowInput:{
     flex: 1,
