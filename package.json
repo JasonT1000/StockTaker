@@ -19,6 +19,8 @@
     "@react-navigation/native-stack": "^6.9.12",
     "@rneui/base": "^0.0.0-edge.2",
     "@rneui/themed": "^0.0.0-edge.2",
+    "deprecated-react-native-prop-types": "^4.0.0",
+    "patch-package": "^6.5.1",
     "react": "18.2.0",
     "react-native": "0.71.6",
     "react-native-blob-util": "^0.17.3",
