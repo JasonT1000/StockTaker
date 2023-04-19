@@ -7,7 +7,6 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import {
-  Alert,
   Button,
   StyleSheet,
   Text,
@@ -19,24 +18,26 @@ import { AppContext } from '../Store/stockItemContext';
 import { Types } from '../Store/reducers';
 
 
-
 function BarcodeScanner({navigation}:any){
-  const [currentItemCode, SetCurrentItemCode] = useState('')
   const {state, dispatch} = useContext(AppContext)
-  const [CurrentItemQuantity, SetCurrentItemQuantity] = useState(0)
-  const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.torch)
 
-  const TorchMode = Object.freeze({
-    ON: RNCamera.Constants.FlashMode.torch,
-    OFF: RNCamera.Constants.FlashMode.off
-  });
+  let scannerRef:QRCodeScanner|null = null
+  
+  const [scanningEnabled, SetScanningEnabled] = useState(false)
+  const [currentItemCode, SetCurrentItemCode] = useState('')
+  const [CurrentItemQuantity, SetCurrentItemQuantity] = useState(0)
+  const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.off)
+
+  enum TorchMode {
+    ON = RNCamera.Constants.FlashMode.torch,
+    OFF = RNCamera.Constants.FlashMode.off
+  };
 
   useEffect(() => {
     const updatedItem = state.stockItems.find(stockItem => stockItem.stockCode === currentItemCode)
     if(updatedItem){
       SetCurrentItemQuantity(updatedItem? updatedItem.quantity: 1)
     }
-
   }, [state.stockItems]);
 
   const addStockItem = (newStockCode:string) => {
@@ -51,7 +52,13 @@ function BarcodeScanner({navigation}:any){
   }
 
   const reactivateScanner = () => {
-    this.scanner.reactivate()
+    if(!scanningEnabled){
+      SetScanningEnabled(true)
+    }
+
+    if(scannerRef){
+      scannerRef.reactivate()
+    }
   }
 
   const torchPressHandler = () =>{
@@ -65,40 +72,51 @@ function BarcodeScanner({navigation}:any){
 
   return (
     <View style={styles.container}>
-      <QRCodeScanner
-        onRead={({data}) => addStockItem(data)}
-        flashMode={torchMode}
-        // reactivate = {canScan}
-        // reactivateTimeout={500}
-        showMarker={true}
-        ref={(node) => {this.scanner = node}}
-        topContent={
-          <View style={styles.topView}>
-            <View style={styles.topViewRow}>
-              <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
-              <Text style={styles.barcodeData}>{currentItemCode}</Text>
-            </View>
-            
-            {CurrentItemQuantity > 0 ?
+      {scanningEnabled ? (
+        <QRCodeScanner
+          onRead={({data}) => addStockItem(data)}
+          flashMode={torchMode}
+          // reactivate = {canScan}
+          // reactivateTimeout={500}
+          showMarker={true}
+          ref={(node) => {scannerRef = node}}
+          topContent={
+            <View style={styles.topView}>
               <View style={styles.topViewRow}>
-                <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
-                <Text style={styles.barcodeData}>{CurrentItemQuantity}</Text>
+                <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
+                <Text style={styles.barcodeData}>{currentItemCode}</Text>
               </View>
-              : null }
-          </View>
-        }
-        containerStyle={styles.cameraContainer}
-        cameraStyle={styles.cameraWindow}
-        // markerStyle={styles.marker}
-        bottomContent={
-          <View style={styles.bottomView}>
-            <Button title='scan code' onPress={reactivateScanner}/>
-            <View style={styles.bottomView}>
-              <Button title='Toggle Torch' onPress={torchPressHandler}/>
+              
+              {CurrentItemQuantity > 0 ?
+                <View style={styles.topViewRow}>
+                  <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
+                  <Text style={styles.barcodeData}>{CurrentItemQuantity}</Text>
+                </View>
+                : null }
             </View>
-          </View>
-        }
-      />
+          }
+          containerStyle={styles.cameraContainer}
+          cameraStyle={styles.cameraWindow}
+          // markerStyle={styles.marker}
+          bottomContent={
+            <View style={styles.bottomView}>
+              <Button title='scan code' onPress={reactivateScanner}/>
+              <View style={styles.bottomView}>
+                <Button title='Toggle Torch' onPress={torchPressHandler}/>
+              </View>
+            </View>
+          }
+        />
+      ) : (
+      <View style={styles.bottomView}>
+        <Text style={styles.startText}>Press Scan Code button to start</Text>
+        <Button title='scan code' onPress={reactivateScanner}/>
+        <View style={styles.bottomView}>
+          <Button title='Toggle Torch' onPress={torchPressHandler}/>
+        </View>
+      </View>
+      )}
+      
     </View>
       
   )
@@ -107,13 +125,12 @@ function BarcodeScanner({navigation}:any){
 const styles = StyleSheet.create({
   container:{
     flex: 1,
-    backgroundColor: 'red',
+    backgroundColor: 'black',
   },
     cameraContainer: {
     backgroundColor: 'black',
   },
   cameraWindow:{
-    // width: 80,
     alignSelf: 'center',
   },
   marker:{
@@ -122,10 +139,7 @@ const styles = StyleSheet.create({
   },
   topView: {
     flex: 1,
-    backgroundColor: 'blue',
-    // padding: 20,
     paddingVertical: 20,
-    // margin: 10,
     marginVertical: 10,
     width: '100%',
     alignItems: 'center',
@@ -142,11 +156,14 @@ const styles = StyleSheet.create({
   },
   bottomView: {
     flex: 1,
-    backgroundColor: 'green',
     marginTop: 20,
     paddingTop: 20,
     width: '100%',
     alignItems: 'center',
+    backgroundColor: 'black',
+  },
+  startText: {
+    marginBottom: 20,
   },
 })
 

@@ -123,7 +123,9 @@ function App({navigation}:any){
     const csvString = `${headerString}${rowString}`;
 
     // if(await hasFolderPermissions()){
-      let file = await ScopedStorage.createDocument("StockTake_2023", "text/csv", csvString);
+      const date = new Date().toLocaleDateString('en-NZ').replace(/\//g, '-')
+      
+      let file = await ScopedStorage.createDocument(("StockTake_" + date), "text/csv", csvString);
       if(file){
         ToastAndroid.show('File saved successfully', ToastAndroid.SHORT)
       }
@@ -168,6 +170,8 @@ function App({navigation}:any){
       <TextInput 
         style={styles.stockCodeInput}
         placeholder='Stockcode here'
+        placeholderTextColor={'grey'}
+        autoCapitalize='none'
         value={inputText}
         onChangeText={SetInputText}
         onSubmitEditing={(submitEvent) => handleStockInputComponentSubmitEvent(submitEvent)} />
@@ -180,7 +184,7 @@ function App({navigation}:any){
         </View>
         <View style={styles.listContainer}>
           <FlatList
-            // keyExtractor={(item)=> item.id}
+            keyExtractor={(item)=> item.id}
             data={state.stockItems}
             removeClippedSubviews={false}
             renderItem={({ item }) => (
@@ -210,6 +214,7 @@ const styles = StyleSheet.create({
     padding: 8,
     margin: 10,
     color: 'white',
+    fontSize: 21,    
     // width: 200,
   },
   listRow:{
@@ -226,6 +231,7 @@ const styles = StyleSheet.create({
   },
   listContainer:{
     flex: 1,
+    marginBottom: 20,
   },
 })
 
