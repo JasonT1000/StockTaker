@@ -25,12 +25,10 @@ function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV}:Props)
 
     // Toggle editing on and off
     useEffect(() => {
-        console.log("toggling Editing mode")
         toggleEditing(isEditing)
     }, [isEditing]);
 
     const editStockStockItems = () => {
-        console.log("editing stock items")
         SetIsEditing(prevState => !prevState)
     }
 

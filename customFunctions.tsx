@@ -14,8 +14,6 @@ export function displayFileContents(csvString: string, callback: (stockCode:stri
         //     displayIllegalStockCode(stockInfo[0]);
         //     continue;
         // }
-        console.log('Item from file')
-        console.log(stockInfo[0], stockInfo[1])
         callback(stockInfo[0], Number(stockInfo[1]))
 
         // if (hasQuantities) {

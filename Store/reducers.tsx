@@ -83,7 +83,6 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
 
   // Updates an existing stock item with the passed in quantity.
   const updateStockItem = (state: StockItem[], id:string, newQuantity:number) => {
-    console.log("Updated an item")
     let index = state.findIndex(stockItems => stockItems.id === id)
     let newArray = [...state];
     newArray[index].quantity = newQuantity;

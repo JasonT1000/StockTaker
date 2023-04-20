@@ -10,13 +10,16 @@ import {
   Button,
   StyleSheet,
   Text,
+  Touchable,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AppContext } from '../Store/stockItemContext';
 import { Types } from '../Store/reducers';
-
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faLightbulb } from '@fortawesome/free-regular-svg-icons/faLightbulb'
 
 function BarcodeScanner({navigation}:any){
   const {state, dispatch} = useContext(AppContext)
@@ -100,8 +103,18 @@ function BarcodeScanner({navigation}:any){
           // markerStyle={styles.marker}
           bottomContent={
             <View style={styles.bottomView}>
-              <Button title='scan code' onPress={reactivateScanner}/>
-              <View style={styles.bottomView}>
+              {/* <Button title='scan code' color={'green'} onPress={reactivateScanner}/> */}
+              <TouchableOpacity onPress={reactivateScanner}>
+                <Text style={styles.scanButton}>Scan Code</Text>
+              </TouchableOpacity>
+              {/* <TouchableOpacity onPress={torchPressHandler}>
+                <FontAwesomeIcon
+                      icon={faLightbulb}
+                      size={32}
+                      color='#2D81D2'
+                  />
+              </TouchableOpacity> */}
+              <View style={[styles.bottomView, styles.torchButton]}>
                 <Button title='Toggle Torch' onPress={torchPressHandler}/>
               </View>
             </View>
@@ -110,10 +123,13 @@ function BarcodeScanner({navigation}:any){
       ) : (
       <View style={styles.bottomView}>
         <Text style={styles.startText}>Press Scan Code button to start</Text>
-        <Button title='scan code' onPress={reactivateScanner}/>
-        <View style={styles.bottomView}>
+        {/* <Button title='scan code' color={'green'} onPress={reactivateScanner}/> */}
+        <TouchableOpacity onPress={reactivateScanner}>
+          <Text style={styles.scanButton}>Scan Code</Text>
+        </TouchableOpacity>
+        {/* <View style={[styles.bottomView, styles.torchButton]}>
           <Button title='Toggle Torch' onPress={torchPressHandler}/>
-        </View>
+        </View> */}
       </View>
       )}
       
@@ -132,6 +148,7 @@ const styles = StyleSheet.create({
   },
   cameraWindow:{
     alignSelf: 'center',
+    maxHeight: 400,
   },
   marker:{
     width: 100,
@@ -149,18 +166,38 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   topViewHeading: {
+    color: '#B5B4BB',
     opacity: 0.75,
   },
   barcodeData:{
+    color: 'white',
     fontSize: 20,
   },
   bottomView: {
     flex: 1,
-    marginTop: 20,
-    paddingTop: 20,
+    // height: 300,
+    marginTop: 10,
+    // marginBottom: 20,
+    paddingTop: 10,
     width: '100%',
     alignItems: 'center',
     backgroundColor: 'black',
+  },
+  scanButton: {
+    // flex: 1,
+    fontSize: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#1AB329',
+    // backgroundColor: '#2D81D2',
+    borderRadius: 5,
+    color: 'white',
+  },
+  torchButton: {
+    flex: 1,
+    marginTop: 20,
+    
+    marginBottom: 5,
   },
   startText: {
     marginBottom: 20,

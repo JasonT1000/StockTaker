@@ -137,11 +137,9 @@ function App({navigation}:any){
       let file = await ScopedStorage.openDocument(true, 'utf8');
 
       if(file){
-        console.log(file)
         if(file.mime === 'text/csv' || file.mime === 'text/comma-separated-values'){
           ToastAndroid.show('File loaded successfully',ToastAndroid.SHORT)
-          // Disable input until files loaded
-          // Display message of loading
+          // NEED TO Disable input until files loaded
           displayFileContents(file.data, addStockItem)
         }
         else{
