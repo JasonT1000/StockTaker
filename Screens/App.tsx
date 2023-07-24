@@ -125,7 +125,7 @@ function App({navigation}:any){
     // if(await hasFolderPermissions()){
       const date = new Date().toLocaleDateString('en-NZ').replace(/\//g, '-')
       
-      let file = await ScopedStorage.createDocument(("StockTake_" + date), "text/csv", csvString);
+      let file = await ScopedStorage.createDocument(("StockTake_" + date + ".csv"), "text/csv", csvString);
       if(file){
         ToastAndroid.show('File saved successfully', ToastAndroid.SHORT)
       }
