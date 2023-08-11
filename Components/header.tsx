@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Button,
+    Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,17 +11,20 @@ import { faPenToSquare } from '@fortawesome/free-solid-svg-icons/faPenToSquare'
 import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons/faFloppyDisk'
 import { faFileImport } from '@fortawesome/free-solid-svg-icons/faFileImport'
 import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode'
+import { faFile } from '@fortawesome/free-solid-svg-icons/faFile'
 
 interface Props {
     toggleEditing:any
     openBarcodeScanner:any
     saveCSV:any
     loadCSV:any
+    clearAllStockItems:any
   }
 
-function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV}:Props)
+function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV, clearAllStockItems}:Props)
 {
     const [isEditing, SetIsEditing] = useState(false)
+    const [showBox, setShowBox] = useState(true);
 
     // Toggle editing on and off
     useEffect(() => {
@@ -31,6 +34,25 @@ function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV}:Props)
     const editStockStockItems = () => {
         SetIsEditing(prevState => !prevState)
     }
+
+    const showConfirmDialog = () => {
+        return Alert.alert(
+          "Clear all stock items",
+          "Are you sure you want to clear all stock items?",
+          [
+            {
+              text: "Yes",
+              onPress: () => {
+                clearAllStockItems();
+                setShowBox(false);
+              },
+            },
+            {
+              text: "No",
+            },
+          ]
+        );
+      };
 
     return(
         <View style={styles.header}>
@@ -66,6 +88,14 @@ function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV}:Props)
                 />
                 <Text style={styles.buttonText}>Scanner</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButtons} onPress={showConfirmDialog}>
+                <FontAwesomeIcon
+                    icon={faFile}
+                    size={32}
+                    color='black'
+                />
+                <Text style={styles.buttonText}>New</Text>
+            </TouchableOpacity>
         </View>
     )
 }
@@ -80,7 +110,7 @@ const styles = StyleSheet.create({
     iconButtons:{
         padding: 5,
         flex: 1,
-        alignItems: 'center'
+        alignItems: 'center',
     },
     buttonText:{
         color: 'black',

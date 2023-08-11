@@ -77,20 +77,6 @@ function App({navigation}:any){
         }
       })
       SetInputText('')
-      // let index = stockItems.findIndex(stockItems => stockItems.stockCode === newStockCode)
-      // if(index == -1){ // Item NOT in the stockItems
-      //   SetStockItems([...stockItems, {stockCode: newStockCode, quantity: 1, id: (Math.max(...stockItems.map((item) => item.id))+1)}])
-      //   SetInputText('')
-      // }
-      // else{ // Add 1 to the existing stockItems quantity
-      //   const newArray = stockItems.map((item) => {
-      //     if (item.stockCode === newStockCode) {
-      //       return { ...item, stockCode: item.stockCode, quantity: (item.quantity+1), id: item.id };
-      //     }
-      //     return item;
-      //   });
-      //   SetStockItems(newArray);
-      // }
     }
   }
 
@@ -110,6 +96,10 @@ function App({navigation}:any){
       type: Types.Delete,
       payload: { id: id }
     })
+  }
+
+  const clearAllStockItems = () =>{
+    dispatch({type: Types.Clear, payload:{}})
   }
 
   const openBarcodeScanner = () =>{
@@ -164,7 +154,7 @@ function App({navigation}:any){
 
   return (
     <View style={styles.mainContainer}>
-      <Header toggleEditing={toggleEditing} openBarcodeScanner={openBarcodeScanner} saveCSV={saveCSV} loadCSV={loadCSV}/>
+      <Header toggleEditing={toggleEditing} openBarcodeScanner={openBarcodeScanner} saveCSV={saveCSV} loadCSV={loadCSV} clearAllStockItems={clearAllStockItems}/>
       <TextInput 
         style={styles.stockCodeInput}
         placeholder='Stockcode here'

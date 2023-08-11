@@ -13,6 +13,7 @@ export enum Types {
     Add = 'ADD_STOCKITEM',
     Delete = 'DELETE_STOCKITEM',
     Update = 'UPDATE_STOCKITEM',
+    Clear = 'CLEAR_STOCKITEMS'
 }
 
 export type StockItem = {
@@ -32,7 +33,9 @@ type StockItemPayload = {
     },
     [Types.Delete] : {
         id:string
-    }
+    },
+    [Types.Clear] : {
+    },
 }
 
 export type StockItemActions = ActionMap<StockItemPayload>[keyof ActionMap<StockItemPayload>]
@@ -49,6 +52,8 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
             return [
             ...state.filter(stockItem => stockItem.id !== action.payload.id),
             ]
+        case Types.Clear:
+            return []
         default:
             return state
     }
