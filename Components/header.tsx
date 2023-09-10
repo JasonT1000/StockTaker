@@ -12,19 +12,22 @@ import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons/faFloppyDisk'
 import { faFileImport } from '@fortawesome/free-solid-svg-icons/faFileImport'
 import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode'
 import { faFile } from '@fortawesome/free-solid-svg-icons/faFile'
+import { faUpload } from '@fortawesome/free-solid-svg-icons/faUpload'
 
 interface Props {
     toggleEditing:any
+    toggleInputModal: any
     openBarcodeScanner:any
     saveCSV:any
     loadCSV:any
     clearAllStockItems:any
-  }
+}
 
-function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV, clearAllStockItems}:Props)
+function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, loadCSV, clearAllStockItems}:Props)
 {
     const [isEditing, SetIsEditing] = useState(false)
     const [showBox, setShowBox] = useState(true);
+    const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
 
     // Toggle editing on and off
     useEffect(() => {
@@ -35,7 +38,7 @@ function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV, clearAllSt
         SetIsEditing(prevState => !prevState)
     }
 
-    const showConfirmDialog = () => {
+    const showNewStocktakeConfirmDialog = () => {
         return Alert.alert(
           "Clear all stock items",
           "Are you sure you want to clear all stock items?",
@@ -52,7 +55,26 @@ function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV, clearAllSt
             },
           ]
         );
-      };
+    };
+    const showUploadConfirmDialog = () => {
+        return Alert.alert(
+          "Upload Stocktake",
+          "Are you sure you want to upload stockItems to server?",
+          [
+            {
+              text: "Yes",
+              onPress: () => {
+                toggleInputModal()
+                setServerIpAddress('192.168.1.74')
+                setShowBox(false);
+              },
+            },
+            {
+              text: "No",
+            },
+          ]
+        );
+    };
 
     return(
         <View style={styles.header}>
@@ -88,13 +110,21 @@ function Header({toggleEditing, openBarcodeScanner, saveCSV, loadCSV, clearAllSt
                 />
                 <Text style={styles.buttonText}>Scanner</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButtons} onPress={showConfirmDialog}>
+            <TouchableOpacity style={styles.iconButtons} onPress={showNewStocktakeConfirmDialog}>
                 <FontAwesomeIcon
                     icon={faFile}
                     size={32}
-                    color='black'
+                    color='#1E3050'
                 />
                 <Text style={styles.buttonText}>New</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButtons} onPress={showUploadConfirmDialog}>
+                <FontAwesomeIcon
+                    icon={faUpload}
+                    size={32}
+                    color='#1E3050'
+                />
+                <Text style={styles.buttonText}>Upload</Text>
             </TouchableOpacity>
         </View>
     )

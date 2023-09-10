@@ -20,6 +20,7 @@ import StockItemRow from '../Components/stockItemRow';
 import { AppContext } from '../Store/stockItemContext';
 import { Types, StockItem } from '../Store/reducers';
 import { displayFileContents } from '../customFunctions';
+import ModalInput from '../Components/modalInput';
 
 
 function App({navigation}:any){
@@ -28,6 +29,9 @@ function App({navigation}:any){
 
   const [isEditing, SetIsEditing] = useState(false)
   const [storeageUri, SetStorageUri] = useState('')
+
+  const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
+  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const {state, dispatch} = useContext(AppContext)
 
@@ -154,7 +158,8 @@ function App({navigation}:any){
 
   return (
     <View style={styles.mainContainer}>
-      <Header toggleEditing={toggleEditing} openBarcodeScanner={openBarcodeScanner} saveCSV={saveCSV} loadCSV={loadCSV} clearAllStockItems={clearAllStockItems}/>
+      <Header toggleEditing={toggleEditing} toggleInputModal={() => setIsModalVisible(!isModalVisible)} openBarcodeScanner={openBarcodeScanner} saveCSV={saveCSV} loadCSV={loadCSV} clearAllStockItems={clearAllStockItems}/>
+      <ModalInput visible={isModalVisible} value='thisisavalue' toggle={() => setIsModalVisible(!isModalVisible)}/>
       <TextInput 
         style={styles.stockCodeInput}
         placeholder='Stockcode here'
