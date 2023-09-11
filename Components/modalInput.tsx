@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, FlatList, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import SearchableDropdown from 'react-native-searchable-dropdown';
 
 interface Props {
@@ -17,49 +17,50 @@ type dropdownItem = {
 const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer}:Props) => {
     // const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
     const [inputValue, setInputValue] = useState<string>('')
-    const [stockCategories, setStockCategories] = useState<null|dropdownItem[]>([{id: 0, name: 'None'}])
+    const [stockCategories, setStockCategories] = useState<dropdownItem[]>([{id: 0, name: 'None'}])
     const [selectedCategory, setSelectedCategory] = useState<null|dropdownItem>(null)
     const [errorText, SetErrorText] = useState('')
 
     const regexIpAddress = /^((\d){1,3}\.){3}(\d){1,3}$/
 
     useEffect(() => {
-        fetch('http://' + serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
-            return resp.json()
-        }).then((data) => {
-            let newCategories: dropdownItem[] = []
+        const loadStockCategories = async () => {
 
-            for (const category of data) {
-                newCategories.push({id:category, name:category})
-            }
+            fetch('http://192.168.1.74:4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
+                return resp.json()
+            }).then((data) => {
+                let newCategories: dropdownItem[] = []
+    
+                for (const category of data) {
+                    newCategories.push({id:category, name:category})
+                }
+    
+                setStockCategories(newCategories)
+                console.log(stockCategories)
+    
+            }).catch((error) => {
+                console.log(error)
+            })
+        }
 
-            setStockCategories(newCategories)
-            console.log(stockCategories)
+        loadStockCategories()
+        // fetch('http://' + serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
+        //     return resp.json()
+        // }).then((data) => {
+        //     let newCategories: dropdownItem[] = []
 
-        }).catch((error) => {
-            console.log(error)
-        })
+        //     for (const category of data) {
+        //         newCategories.push({id:category, name:category})
+        //     }
+
+        //     setStockCategories(newCategories)
+        //     console.log(stockCategories)
+
+        // }).catch((error) => {
+        //     console.log(error)
+        // })
     }, [])
 
-    // const loadStockCategories = async () => {
-
-    //     fetch('http://192.168.1.74:4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
-    //         return resp.json()
-    //     }).then((data) => {
-    //         let newCategories: dropdownItem[] = []
-
-    //         for (const category of data) {
-    //             newCategories.push({id:category, name:category})
-    //         }
-
-    //         setStockCategories(newCategories)
-    //         console.log(stockCategories)
-
-    //     }).catch((error) => {
-    //         console.log(error)
-    //     })
-    // }
-    
     const onTextChange = (newIpAddress:string) => {
         console.log("Text changed")
         console.log(newIpAddress)
@@ -81,14 +82,17 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
 
     const onSubmit = () => {
         // loadStockCategories()
-        console.log("submitted to server")
+        console.log("inputvalue is " + inputValue)
         if(inputValue === '' && serverIpAddress){
-            uploadStockCodesToServer()
+            console.log('1')
+            uploadStockCodesToServer(serverIpAddress)
+            // Create a stockSection and send to server
         }
-        if(isValidInput(inputValue)){
+        else if(isValidInput(inputValue)){
             uploadStockCodesToServer(inputValue)
             console.log("Valid ipaddress added")
             console.log(serverIpAddress)
+            // Create a stockSection and send to server
         }
     }
 
@@ -120,6 +124,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
                     
                     <View style={styles.modalContentContainer}>
                         <Text style={styles.modalTextLabel}>Select stocktake category:</Text>
+                        
                         <SearchableDropdown
                             selectedItems={selectedCategory}
                             onItemSelect={(item:dropdownItem) => {
@@ -136,7 +141,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
                             resetValue={false}
                             textInputProps={
                                 {
-                                    placeholder: "placeholder",
+                                    placeholder: "pick a stock category",
                                     underlineColorAndroid: "transparent",
                                     style: styles.SearchableDropdownTextInput,
                                     // onTextChange: text => alert(text)
@@ -145,10 +150,11 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
                             }
                             listProps={
                                 {
-                                    nestedScrollEnabled: true,
+                                    nestedScrollEnabled: false,
                                 }
                             }
                         />
+                        
                     </View>
 
                     <View style={styles.modalContentContainer}>

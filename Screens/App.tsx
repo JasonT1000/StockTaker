@@ -144,11 +144,9 @@ function App({navigation}:any){
   }
 
   const uploadStockCodesToServer = (newServerIpAddress:string) =>{
-    if(newServerIpAddress !== ''){ //Update ipaddress first
+    if(newServerIpAddress !== ''){ //Update ipaddress if new
       setServerIpAddress(newServerIpAddress)
     }
-
-    
   }
 
   // const hasFolderPermissions = async () => {
