@@ -143,23 +143,43 @@ function App({navigation}:any){
     // }
   }
 
-  const hasFolderPermissions = async () => {
-    if(storeageUri !== ''){ return true }
-
-    let dir = await ScopedStorage.openDocumentTree(true);
-    
-    if(dir){
-      SetStorageUri(dir.uri)
-      return true
+  const uploadStockCodesToServer = (newServerIpAddress:string) =>{
+    if(newServerIpAddress !== ''){ //Update ipaddress first
+      setServerIpAddress(newServerIpAddress)
     }
 
-    return false
+    
   }
+
+  // const hasFolderPermissions = async () => {
+  //   if(storeageUri !== ''){ return true }
+
+  //   let dir = await ScopedStorage.openDocumentTree(true);
+    
+  //   if(dir){
+  //     SetStorageUri(dir.uri)
+  //     return true
+  //   }
+
+  //   return false
+  // }
 
   return (
     <View style={styles.mainContainer}>
-      <Header toggleEditing={toggleEditing} toggleInputModal={() => setIsModalVisible(!isModalVisible)} openBarcodeScanner={openBarcodeScanner} saveCSV={saveCSV} loadCSV={loadCSV} clearAllStockItems={clearAllStockItems}/>
-      <ModalInput visible={isModalVisible} value='thisisavalue' toggle={() => setIsModalVisible(!isModalVisible)}/>
+      <Header
+        toggleEditing={toggleEditing}
+        toggleInputModal={() => setIsModalVisible(!isModalVisible)}
+        openBarcodeScanner={openBarcodeScanner}
+        saveCSV={saveCSV}
+        loadCSV={loadCSV}
+        clearAllStockItems={clearAllStockItems}
+      />
+      <ModalInput
+        visible={isModalVisible}
+        toggle={() => setIsModalVisible(!isModalVisible)}
+        serverIpAddress={serverIpAddress}
+        uploadStockCodesToServer={uploadStockCodesToServer}
+      />
       <TextInput 
         style={styles.stockCodeInput}
         placeholder='Stockcode here'
@@ -167,8 +187,10 @@ function App({navigation}:any){
         autoCapitalize='none'
         value={inputText}
         onChangeText={SetInputText}
-        onSubmitEditing={(submitEvent) => handleStockInputComponentSubmitEvent(submitEvent)} />
-        {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
+        onSubmitEditing={(submitEvent) => handleStockInputComponentSubmitEvent(submitEvent)}
+      />
+      {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
+
       <View style={styles.mainContentContainer}>
         <View style = {styles.listRow}>
           <Text style={styles.rowHeading}>ItemCode</Text>

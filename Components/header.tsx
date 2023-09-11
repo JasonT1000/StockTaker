@@ -27,7 +27,6 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
 {
     const [isEditing, SetIsEditing] = useState(false)
     const [showBox, setShowBox] = useState(true);
-    const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
 
     // Toggle editing on and off
     useEffect(() => {
@@ -47,25 +46,6 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
               text: "Yes",
               onPress: () => {
                 clearAllStockItems();
-                setShowBox(false);
-              },
-            },
-            {
-              text: "No",
-            },
-          ]
-        );
-    };
-    const showUploadConfirmDialog = () => {
-        return Alert.alert(
-          "Upload Stocktake",
-          "Are you sure you want to upload stockItems to server?",
-          [
-            {
-              text: "Yes",
-              onPress: () => {
-                toggleInputModal()
-                setServerIpAddress('192.168.1.74')
                 setShowBox(false);
               },
             },
@@ -118,7 +98,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                 />
                 <Text style={styles.buttonText}>New</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButtons} onPress={showUploadConfirmDialog}>
+            <TouchableOpacity style={styles.iconButtons} onPress={() => toggleInputModal()}>
                 <FontAwesomeIcon
                     icon={faUpload}
                     size={32}
