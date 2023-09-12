@@ -19,6 +19,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import App from './Screens/App';
 import BarcodeScanner from './Screens/BarcodeScanner';
 import { AppProvider } from './Store/stockItemContext';
+import DataUpload from './Screens/DataUpload';
 
 const Stack = createNativeStackNavigator()
 
@@ -33,6 +34,9 @@ function BaseApp(){
           <Stack.Screen
             name='BarcodeScanner' component={BarcodeScanner}
           />
+          {/* <Stack.Screen
+            name='DataUpload' component={DataUpload}
+          /> */}
         </Stack.Navigator>
       </AppProvider>
     </NavigationContainer>

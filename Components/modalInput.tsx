@@ -1,6 +1,9 @@
+import { height } from "@fortawesome/free-solid-svg-icons/faPenToSquare";
 import React, { useEffect, useState } from "react";
 import { Button, FlatList, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import SearchableDropdown from 'react-native-searchable-dropdown';
+// import SearchableDropdown from 'react-native-searchable-dropdown';
+import DropDownPicker from 'react-native-dropdown-picker';
+import CategoryDropdown from "./categoryDropdown";
 
 interface Props {
     visible:boolean
@@ -10,15 +13,15 @@ interface Props {
 }
 
 type dropdownItem = {
-    id: number,
-    name: string
+    label: string,
+    value: string
 }
 
 const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer}:Props) => {
-    // const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
     const [inputValue, setInputValue] = useState<string>('')
-    const [stockCategories, setStockCategories] = useState<dropdownItem[]>([{id: 0, name: 'None'}])
-    const [selectedCategory, setSelectedCategory] = useState<null|dropdownItem>(null)
+    const [open, setOpen] = useState(false);
+    const [stockCategories, setStockCategories] = useState<dropdownItem[]>([{label: 'None', value: 'None'}])
+    const [selectedCategory, setSelectedCategory] = useState<null|string>(null)
     const [errorText, SetErrorText] = useState('')
 
     const regexIpAddress = /^((\d){1,3}\.){3}(\d){1,3}$/
@@ -32,11 +35,11 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
                 let newCategories: dropdownItem[] = []
     
                 for (const category of data) {
-                    newCategories.push({id:category, name:category})
+                    newCategories.push({label:category, value:category})
                 }
     
                 setStockCategories(newCategories)
-                console.log(stockCategories)
+                // console.log(stockCategories)
     
             }).catch((error) => {
                 console.log(error)
@@ -81,7 +84,10 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
       }
 
     const onSubmit = () => {
-        // loadStockCategories()
+
+        // Check a stockcategory has been chosen
+        // display errror if not
+        
         console.log("inputvalue is " + inputValue)
         if(inputValue === '' && serverIpAddress){
             console.log('1')
@@ -96,68 +102,24 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
         }
     }
 
-    const setCustomCategory = (newCategory:string) =>{
-        const newCategoryItem:dropdownItem = {id: 0, name: newCategory}
-
-        if(stockCategories){
-            newCategoryItem.id = stockCategories.length
-            setStockCategories([...stockCategories, newCategoryItem])
+    const createDropdownItem = (value:string|null):dropdownItem|null => {
+        if(!value) return null
+        return {
+            label: value,
+            value: value
         }
-        else{
-            setStockCategories([newCategoryItem])
-        }
-
-        setSelectedCategory(newCategoryItem)
     }
 
     return ( 
         <Modal animationType="fade" visible={visible} transparent={true} style={{justifyContent:'center'}}>
-            <View
-                style={styles.modalContainer}>
+            <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTextTitle}>Upload stockCodes to server</Text>
 
-                    <View style={styles.modalContentContainer}>
+                    <View style={styles.ipaddressContentContainer}>
                         <Text style={styles.modalTextLabel}>Current server IpAddress:</Text>
                         <Text style={styles.modalText}>{serverIpAddress}</Text>
-                    </View>
-                    
-                    <View style={styles.modalContentContainer}>
-                        <Text style={styles.modalTextLabel}>Select stocktake category:</Text>
-                        
-                        <SearchableDropdown
-                            selectedItems={selectedCategory}
-                            onItemSelect={(item:dropdownItem) => {
-                                console.log(item)
-                                setSelectedCategory(item)
-                            }}
-                            onSubmit={((value:string) => { console.log(value)})}
-                            containerStyle={{ padding: 5 }}
-                            itemStyle={styles.SearchableDropdownItem}
-                            itemTextStyle={{ color: 'black' }}
-                            itemsContainerStyle={{ maxHeight: 240, zIndex: 5, elevation: 5 }}
-                            items={stockCategories}
-                            defaultIndex={0}
-                            resetValue={false}
-                            textInputProps={
-                                {
-                                    placeholder: "pick a stock category",
-                                    underlineColorAndroid: "transparent",
-                                    style: styles.SearchableDropdownTextInput,
-                                    // onTextChange: text => alert(text)
-                                    onSubmitEditing : (event:any) => setCustomCategory(event.nativeEvent.text)
-                                }
-                            }
-                            listProps={
-                                {
-                                    nestedScrollEnabled: false,
-                                }
-                            }
-                        />
-                        
-                    </View>
 
-                    <View style={styles.modalContentContainer}>
                         <Text style={styles.modalTextLabel}>Change server IpAddress:</Text>
                         <TextInput
                             style={styles.modalTextInput}
@@ -169,7 +131,24 @@ const ModalInput = ({ visible, toggle, serverIpAddress, uploadStockCodesToServer
                         {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
                     </View>
                     
-                    <View style={styles.modalButtons}>
+                    <View style={styles.dropdownContentContainer}>
+                        <Text style={styles.modalTextLabel}>Select stocktake category:</Text>
+                        <CategoryDropdown/>
+                        {/* <DropDownPicker
+                            open={open}
+                            value={selectedCategory}
+                            items={stockCategories}
+                            setOpen={setOpen}
+                            setValue={setSelectedCategory}
+                            setItems={setStockCategories}
+                            searchable={true}
+                            addCustomItem={true}
+                            listMode="SCROLLVIEW"
+                            autoScroll={true}
+                        />                   */}
+                    </View>
+
+                    <View style={styles.modalButtonContainer}>
                         <Button title="Cancel" onPress={toggle} />
                         <Button title="Upload" onPress={onSubmit} />
                     </View>
@@ -183,20 +162,24 @@ const styles = StyleSheet.create({
 
     modalContainer:{
         backgroundColor: 'rgba(52, 52, 52, 0.7)',
-        flex: 1,
-        // justifyContent: 'center',
+        // flex: 1,
+        height: '100%',
+        borderColor: 'purple',
+        borderWidth: 2,
     },
     modalContent:{
-        height: 500,
+        // flex: 1,
         opacity: 1,
         padding: 20,
+        height: '80%',
         width: '80%',
         alignSelf: 'center',
         justifyContent: 'center',
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(255, 255, 255, 1)',
+        borderColor: 'orange',
+        borderWidth: 2,
     },
     modalTextTitle:{
-        flex: 1,
         fontWeight: 'bold',
         textAlign: 'center',
         height: 40,
@@ -211,11 +194,27 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: 'grey',
     },
-    modalContentContainer:{
-        flex: 2,
+    ipaddressContentContainer:{
+        flex: 0,
+        zIndex: 1,
+    },
+    dropdownContentContainer:{
+        flex: 1,
+        alignContent: "center",
+        borderColor: 'green',
+        borderWidth: 2,
+        zIndex: 2000,
+        
+    },
+    dropdownPicker:{
+        // flex: 1,
+        height: 50,
+        alignContent: "center",
+        zIndex: 1000,
+        // flexGrow: 1,
     },
     modalText:{
-        flex: 1,
+        flex: 0,
         fontWeight: 'bold',
         textAlign: 'center',
         height: 40,
@@ -231,27 +230,12 @@ const styles = StyleSheet.create({
         color: 'grey',
         fontSize: 21,
     },
-    modalButtons:{
+    modalButtonContainer:{
         flexDirection: 'row',
         gap: 30,
         alignSelf: 'center',
         marginTop: 30,
-    },
-    SearchableDropdownTextInput:{
-        padding: 12,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        color: 'black',
-        textTransform:'capitalize',
-    },
-    SearchableDropdownItem:{
-        padding: 10,
-        marginTop: 2,
-        backgroundColor: '#ddd',
-        borderColor: '#bbb',
-        borderWidth: 1,
-        borderRadius: 5,
+        zIndex: 1,
     },
   })
  

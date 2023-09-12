@@ -110,6 +110,10 @@ function App({navigation}:any){
     navigation.navigate('BarcodeScanner')
   }
 
+  // const openDataUploader = () => {
+  //   navigation.navigate('DataUpload')
+  // }
+
   const saveCSV = async () => {
     // construct csvString
     const headerString = 'stockcode,qty\n';
@@ -168,6 +172,7 @@ function App({navigation}:any){
         toggleEditing={toggleEditing}
         toggleInputModal={() => setIsModalVisible(!isModalVisible)}
         openBarcodeScanner={openBarcodeScanner}
+        // openDataUploader={openDataUploader}
         saveCSV={saveCSV}
         loadCSV={loadCSV}
         clearAllStockItems={clearAllStockItems}
