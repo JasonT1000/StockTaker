@@ -1,122 +1,79 @@
-import React, { useEffect, useState } from "react";
-import { Button, Text, TextInput, View, StyleSheet, TouchableOpacity, ScrollView, FlatList } from "react-native";
-import DropDownPicker from 'react-native-dropdown-picker';
+import React, { useState } from "react";
+import { Text, TextInput, View, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { dropdownItem } from "./modalInput";
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
+import { faCaretDown } from '@fortawesome/free-solid-svg-icons/faCaretDown'
+import { faCaretUp } from '@fortawesome/free-solid-svg-icons/faCaretUp'
+
 
 interface Props {
-    visible:boolean
-    toggle:any
-    serverIpAddress:null|string
-    uploadStockCodesToServer:any
+    inputValue:string
+    items:dropdownItem[]
+    setValue:any
+    setItems:any
 }
 
-type dropdownItem = {
-    id: number,
-    label: string,
-    value: string
-}
+// type dropdownItem = {
+//     // id: number,
+//     label: string,
+//     value: string
+// }
 
-const CategoryDropdown = () => {
-    const [serverIpAddress, setServerIpaddress] = useState<string>('')
-    const [inputValue, setInputValue] = useState<string>('')
+const CategoryDropdown = ({inputValue, items, setValue, setItems}:Props) => {
+    const [tempCategory, setTempCategory] = useState<string>('')
     const [open, setOpen] = useState(false);
-    const [stockCategories, setStockCategories] = useState<dropdownItem[]>([{id: 0, label: 'None', value: 'None'}])
-    const [selectedCategory, setSelectedCategory] = useState<null|string>(null)
-    const [errorText, SetErrorText] = useState('')
 
-    const regexIpAddress = /^((\d){1,3}\.){3}(\d){1,3}$/
-
-    useEffect(() => {
-        const loadStockCategories = async () => {
-
-            fetch('http://192.168.1.74:4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
-                return resp.json()
-            }).then((data) => {
-                let newCategories: dropdownItem[] = []
-    
-                for (const category of data) {
-                    newCategories.push({id: newCategories.length, label:category, value:category})
-                }
-    
-                setStockCategories(newCategories)
-    
-            }).catch((error) => {
-                console.log(error)
-            })
-        }
-
-        loadStockCategories()
-        // fetch('http://' + serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
-        //     return resp.json()
-        // }).then((data) => {
-        //     let newCategories: dropdownItem[] = []
-
-        //     for (const category of data) {
-        //         newCategories.push({id:category, name:category})
-        //     }
-
-        //     setStockCategories(newCategories)
-        //     console.log(stockCategories)
-
-        // }).catch((error) => {
-        //     console.log(error)
-        // })
-    }, [])
-
-    const onTextChange = (newIpAddress:string) => {
-        console.log("Text changed")
-        console.log(newIpAddress)
-        setInputValue(newIpAddress)
+    const onPressDropdownButton = () => {
+        setTempCategory('')
+        setOpen(!open);
     }
 
-    const isValidInput = (string:string) => {
-    
-        if(regexIpAddress.test(string)){
-          SetErrorText('')
-          setInputValue('')
-          return true;
-        }
-    
-        SetErrorText('Not a valid Ipaddress')
-    
-        return false;
-      }
-
-    const onSubmit = () => {
-
-        // Check a stockcategory has been chosen
-        // display errror if not
-        
-        console.log("inputvalue is " + inputValue)
-        if(inputValue === '' && serverIpAddress){
-            console.log('1')
-            // uploadStockCodesToServer(serverIpAddress)
-            setServerIpaddress(serverIpAddress)
-            // Create a stockSection and send to server
-        }
-        else if(isValidInput(inputValue)){
-            // uploadStockCodesToServer(inputValue)
-            setServerIpaddress(inputValue)
-            console.log("Valid ipaddress added")
-            console.log(serverIpAddress)
-            // Create a stockSection and send to server
-        }
+    const onItemSelect = (category:string) => {
+        setValue(category)
+        setOpen(false)
     }
 
-    // const createDropdownItem = (value:string|null):dropdownItem|null => {
-    //     if(!value) return null
-    //     return {
-    //         label: value,
-    //         value: value
-    //     }
-    // }
+    const onInputSubmit = (newCategory:any) => {
+        if(newCategory === '') {
+            setOpen(false)
+            return
+        }
+
+        //If item doesnt exist
+        let existingIndex = items.findIndex((stockCategory) => stockCategory.label === newCategory)
+        if(existingIndex == -1){
+            setItems([...items, createDropdownItem(newCategory)])
+            setValue(newCategory)
+            
+        }
+
+        // clear input
+        setTempCategory('')
+    }
+
+    const createDropdownItem = (value:string):dropdownItem => {
+        return {
+            label: value,
+            value: value
+        }
+    }
 
     const DropdownTogglerItem = ({ title }:{title:string}) => (
-        <TouchableOpacity style={styles.button} onPress={() => {setOpen(!open); console.log("toggle dropdown")}}>
-          <Text style={styles.title}>{title}</Text>
+        <TouchableOpacity
+            style={[styles.dropdownButton, open? styles.dropdownButtonOpen: null]}
+            onPress={onPressDropdownButton}
+            >
+            <Text style={styles.dropdownButtonText}>{title}</Text>
+            <FontAwesomeIcon
+                icon={open? faCaretUp : faCaretDown}
+                size={32}
+                color='grey'
+                style={styles.dropdownButtonIcon}
+            />
         </TouchableOpacity>
     );
     const Item = ({ title }:{title:string}) => (
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => onItemSelect(title)}>
           <Text style={styles.title}>{title}</Text>
         </TouchableOpacity>
     );
@@ -126,26 +83,27 @@ const CategoryDropdown = () => {
     };
 
     return ( 
-        <View style={styles.container}>
+        <View style={[styles.container, open? styles.open: styles.closed]}>
             { open?
                 <>
-                    <DropdownTogglerItem title={">"}/>
+                    <DropdownTogglerItem title={inputValue}/>
                     <TextInput
-                        // style={styles.modalTextInput}
-                        style={styles.title}
-                        placeholder='Create new category'
+                        style={[styles.title, styles.textInputNewCat]}
+                        placeholder='New category...'
                         placeholderTextColor='rgba(52, 52, 52, 0.3)'
-                        value={inputValue}
-                        onChangeText={onTextChange}
+                        value={tempCategory}
+                        onChangeText={setTempCategory}
+                        onSubmitEditing={(value)=> onInputSubmit(value.nativeEvent.text)}
                     />
                 
                     <FlatList
-                        data={stockCategories}
+                        nestedScrollEnabled={true}
+                        data={items}
                         renderItem={renderItem}
-                        // keyExtractor={item => item.id}
+                        style={{flexGrow:1}}
                     />
                 </>
-                : <DropdownTogglerItem title={"<"}/>
+                : <DropdownTogglerItem title={inputValue}/>
             }
         </View>
      );
@@ -153,24 +111,54 @@ const CategoryDropdown = () => {
 
 const styles = StyleSheet.create({
     container: {
-        height: 250,
         width: '100%',
         marginTop: 0,
         alignSelf: "center",
-        zIndex: 1000,
         backgroundColor: 'white',
-      },
-      button: {
-        alignItems: 'center',
-        // backgroundColor: '#DDDDDD',
-        // padding: 10,
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: 5,
+        zIndex: 1000,
+    },
+    open:{
+        height: 280,
+    },
+    closed:{
+        height: 50,
+    },
+    dropdownButton:{
+        flex: 0,
+        flexDirection: 'row',
+        width: '100%',
+        padding: 10,
+    },
+    dropdownButtonOpen:{
+        borderColor: 'grey',
+        borderBottomWidth: 1
+    },
+    dropdownButtonIcon:{
+        width: 20,
+    },
+    dropdownButtonText:{
+        width: '90%',
+        fontSize: 20,
+        color: 'black',
+        textAlign: 'left',
+    },
+    button: {
         marginVertical: 8,
         marginHorizontal: 16,
-      },
-      title: {
+    },
+    title: {
         fontSize: 20,
-        color: 'black'
-      },
+        color: 'black',
+    },
+    textInputNewCat: {
+        borderColor: 'grey',
+        borderWidth: 1,
+        borderRadius: 5,
+        margin: 10,
+    },
 })
  
 export default CategoryDropdown;

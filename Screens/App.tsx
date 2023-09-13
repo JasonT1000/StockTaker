@@ -151,6 +151,9 @@ function App({navigation}:any){
     if(newServerIpAddress !== ''){ //Update ipaddress if new
       setServerIpAddress(newServerIpAddress)
     }
+
+    // Create object with category and stockcodes
+    // Upload data to server
   }
 
   // const hasFolderPermissions = async () => {
