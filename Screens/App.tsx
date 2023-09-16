@@ -147,14 +147,29 @@ function App({navigation}:any){
     // }
   }
 
-  const uploadStockCodesToServer = (newServerIpAddress:string) =>{
+  /**
+   * Updates the server IpAddress
+   * @param newServerIpAddress 
+   * @returns {boolean} true if server IpAddress was updated else false
+   */
+  const updateServerIpaddress = (newServerIpAddress:string):boolean => {
     if(newServerIpAddress !== ''){ //Update ipaddress if new
       setServerIpAddress(newServerIpAddress)
+      return true
     }
+
+    return false
+  }
+  // const uploadStockCodesToServer = (newServerIpAddress:string) =>{
+  //   if(updateServerIpaddress(newServerIpAddress)){
+
+  // }
+
+
 
     // Create object with category and stockcodes
     // Upload data to server
-  }
+  // }
 
   // const hasFolderPermissions = async () => {
   //   if(storeageUri !== ''){ return true }
@@ -184,7 +199,8 @@ function App({navigation}:any){
         visible={isModalVisible}
         toggle={() => setIsModalVisible(!isModalVisible)}
         serverIpAddress={serverIpAddress}
-        uploadStockCodesToServer={uploadStockCodesToServer}
+        updateServerIpaddress={updateServerIpaddress}
+        // uploadStockCodesToServer={uploadStockCodesToServer}
       />
       <TextInput 
         style={styles.stockCodeInput}
