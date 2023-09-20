@@ -7,7 +7,7 @@ import { AppContext } from "../Store/stockItemContext";
 
 interface Props {
     visible:boolean
-    toggle:any
+    toggle:Function
     serverIpAddress:null|string
     // updateServerIpaddress:any
     updateServerIpaddress:(newServerIpAddress:string) => boolean
@@ -27,6 +27,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
     const [selectedCategory, setSelectedCategory] = useState<string>('')
     const [errorIpAddressText, setErrorIpAddressText] = useState('')
     const [errorCategoryText, setErrorCategoryText] = useState<null|string>('')
+    const [errorUploadText, setErrorUploadText] = useState<null|string>('')
 
     const firstUpdate = useRef(true);
 
@@ -36,7 +37,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         if(serverIpAddress) loadStockCategories()
     }, [serverIpAddress])
 
-    useEffect(() => {
+    useEffect(() => { // On first load dont show empty category error message
         if(firstUpdate.current && serverIpAddress){
             firstUpdate.current = false;
         }
@@ -47,9 +48,9 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
 
     const loadStockCategories = async () => {
 
-        fetch('http://' + serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",}).then((resp) => {
-            return resp.json()
-        }).then((data) => {
+        fetch('http://' + serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",})
+        .then((resp) => resp.json())
+        .then((data) => {
             let newCategories: dropdownItem[] = []
 
             for (const category of data) {
@@ -59,6 +60,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
             setStockCategories(newCategories)
 
         }).catch((error) => {
+            console.log("Error fetching categories from server")
             console.log(error)
         })
     }
@@ -79,29 +81,52 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         for (const stockItem of state.stockItems) {
             stockCodeData.push(stockCodeSection(stockItem.stockCode, stockItem.quantity))
         }
-
+        console.log("uploadStockCodesToServer function 2")
         if(stockCodeData.length > 0){
-            const response = await fetch('http://' + serverIpAddress + ':4000/api/stockcodes/' + selectedCategory, {
+            fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory, {
                 method: 'POST',
                 body: JSON.stringify(stockCodeData),
                 headers: {
                     'Content-Type': 'application/json'
                 }
             })
-
-            const json = await response.json()
-
-            if(!response.ok){
-                // setError(json.error)
-                console.log(json.error)
-            }
-            else{
+            .then((resp) => resp.json())
+            .then((data) => {
                 console.log("Successfully uploaded stock code data")
                 // On reply
                 // update stock items with which ones were uploaded to server
                     // show green cloud for successful upload
-                    // show red cloud for unsuccessful upload
-            }
+                hideModal()    
+            }).catch((error) => {
+                console.log("Error uploading stockItems to server")
+                console.log(error)
+                setErrorUploadText("Error uploading stockItems to server")
+            })
+
+
+            // const response = await fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory, {
+            //     method: 'POST',
+            //     body: JSON.stringify(stockCodeData),
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     }
+            // })
+
+            // const json = await response.json()
+
+            // if(response.ok){
+            //     console.log("Successfully uploaded stock code data")
+            //     // On reply
+            //     // update stock items with which ones were uploaded to server
+            //         // show green cloud for successful upload
+            //     hideModal()
+            // }
+            // else{
+            //     console.log("response from server NOT ok")
+            //     console.log(json.error)
+            //     // Display the error message user
+            //     setErrorUploadText(json.error)
+            // }
         }
     }
 
@@ -138,6 +163,8 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
     }
 
     const onSubmit = () => {
+        setErrorUploadText('')
+
         if(isValidCategory())
         {
             if(serverIpAddress)
@@ -152,6 +179,11 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
             }
         }
         else if( tempIpAddress !== '') isValidInput(tempIpAddress)
+    }
+
+    const hideModal = () => {
+        setTempIpAddress('')
+        toggle()
     }
 
     // const createDropdownItem = (value:string|null):dropdownItem|null => {
@@ -182,7 +214,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                                     onChangeText={onTextChange}
                                     // onSubmitEditing={(value) => onSubmitIpAddress(value.nativeEvent.text)}
                                 />
-                                {errorIpAddressText ? <Text style={{ color: 'red' }}>{errorIpAddressText}</Text> : null}
+                                { errorIpAddressText ? <Text style={{ color: 'red' }}>{errorIpAddressText}</Text> : null }
                             </View>
                             
                             <View style={styles.dropdownContentContainer} pointerEvents="auto">
@@ -193,8 +225,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                                     setValue={setSelectedCategory}
                                     setItems={setStockCategories}
                                 />
-                                {errorCategoryText? <Text style={{ color: 'red' }}>{errorCategoryText}</Text> : null
-                                }
+                                { errorCategoryText? <Text style={{ color: 'red' }}>{errorCategoryText}</Text> : null }
                             </View>
                         </>
                         :
@@ -208,12 +239,15 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                                     onChangeText={onTextChange}
                                     // onSubmitEditing={(value) => onSubmitIpAddress(value.nativeEvent.text)}
                                 />
-                                {errorIpAddressText ? <Text style={{ color: 'red' }}>{errorIpAddressText}</Text> : null}
+                                { errorIpAddressText ? <Text style={{ color: 'red' }}>{errorIpAddressText}</Text> : null }
                             </View>
                     }
 
+                    <View>
+                        { errorUploadText ? <Text style={{ color: 'red' }}>{errorUploadText}</Text> : null }
+                    </View>
                     <View style={styles.modalButtonContainer}>
-                        <Button title="Cancel" onPress={toggle} />
+                        <Button title="Cancel" onPress={hideModal} />
                         { serverIpAddress? 
                             <Button title={"Upload"} onPress={onSubmit} />
                             :
@@ -242,8 +276,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(255, 255, 255, 1)',
-        borderColor: 'orange',
-        borderWidth: 2,
         flexGrow: 0,
     },
     modalTextTitle:{
@@ -271,11 +303,6 @@ const styles = StyleSheet.create({
         margin: 9,
         zIndex: 2000,
     },
-    // dropdownPicker:{
-    //     height: 50,
-    //     alignContent: "center",
-    //     zIndex: 1000,
-    // },
     modalText:{
         flex: 0,
         fontWeight: 'bold',

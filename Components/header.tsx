@@ -88,7 +88,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                     size={32}
                     color='navy'
                 />
-                <Text style={styles.buttonText}>Scanner</Text>
+                <Text style={styles.buttonText}>Scan</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButtons} onPress={showNewStocktakeConfirmDialog}>
                 <FontAwesomeIcon
