@@ -83,7 +83,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         }
         console.log("uploadStockCodesToServer function 2")
         if(stockCodeData.length > 0){
-            fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory, {
+            fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory + '&true' , {
                 method: 'POST',
                 body: JSON.stringify(stockCodeData),
                 headers: {
