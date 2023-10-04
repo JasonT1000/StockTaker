@@ -9,9 +9,7 @@ interface Props {
     visible:boolean
     toggle:Function
     serverIpAddress:null|string
-    // updateServerIpaddress:any
     updateServerIpaddress:(newServerIpAddress:string) => boolean
-    // uploadStockCodesToServer:any
 }
 
 export type dropdownItem = {
@@ -100,30 +98,6 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                 console.log(error)
                 setErrorUploadText("Error uploading stockItems to server. Check server is running and Ipaddress is correct")
             })
-
-
-            // const response = await fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory + '&true', {
-            //     method: 'POST',
-            //     body: JSON.stringify(stockCodeData),
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     }
-            // })
-
-            // const json = await response.json()
-
-            // if(response.ok){
-            //     console.log("Successfully uploaded stock code data")
-            //     console.log(response.statusText)
-            //     hideModal()
-            // }
-            // else if(!response.ok){
-            //     console.log("response from server NOT ok")
-            //     console.log(response.statusText)
-            //     console.log(json.error)
-            //     // Display the error message user
-            //     setErrorUploadText(json.error)
-            // }
         }
     }
 
@@ -134,7 +108,6 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
     const isValidInput = (string:string) => {
         if(regexIpAddress.test(string)){
           setErrorIpAddressText('')
-        //   setTempIpAddress('')
           return true;
         }
     
@@ -215,7 +188,6 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                                     placeholderTextColor= 'rgba(52, 52, 52, 0.3)'
                                     value={tempIpAddress}
                                     onChangeText={onTextChange}
-                                    // onSubmitEditing={(value) => onSubmitIpAddress(value.nativeEvent.text)}
                                 />
                                 { errorIpAddressText ? <Text style={{ color: 'red' }}>{errorIpAddressText}</Text> : null }
                             </View>
@@ -240,7 +212,6 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                                     placeholderTextColor= 'rgba(52, 52, 52, 0.3)'
                                     value={tempIpAddress}
                                     onChangeText={onTextChange}
-                                    // onSubmitEditing={(value) => onSubmitIpAddress(value.nativeEvent.text)}
                                 />
                                 { errorIpAddressText ? <Text style={{ color: 'red' }}>{errorIpAddressText}</Text> : null }
                             </View>
@@ -273,8 +244,6 @@ const styles = StyleSheet.create({
         flex: 0,
         opacity: 1,
         padding: 20,
-        // height: '100%',
-        // height: 450,
         width: '80%',
         alignSelf: 'center',
         justifyContent: 'center',

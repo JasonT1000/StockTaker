@@ -69,7 +69,6 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
             quantity: payload.quantity? payload.quantity : 1,
             id: payload.stockCode,
         }])
-    // SetInputText('')
     }
     else{ // Add 1 to the existing stockItems quantity
         const newArray = state.map((item) => {

@@ -10,7 +10,6 @@ import {
   Button,
   StyleSheet,
   Text,
-  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -18,8 +17,6 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AppContext } from '../Store/stockItemContext';
 import { Types } from '../Store/reducers';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faLightbulb } from '@fortawesome/free-regular-svg-icons/faLightbulb'
 
 function BarcodeScanner({navigation}:any){
   const {state, dispatch} = useContext(AppContext)
@@ -103,17 +100,9 @@ function BarcodeScanner({navigation}:any){
           // markerStyle={styles.marker}
           bottomContent={
             <View style={styles.bottomView}>
-              {/* <Button title='scan code' color={'green'} onPress={reactivateScanner}/> */}
               <TouchableOpacity onPress={reactivateScanner}>
                 <Text style={styles.scanButton}>Scan Code</Text>
               </TouchableOpacity>
-              {/* <TouchableOpacity onPress={torchPressHandler}>
-                <FontAwesomeIcon
-                      icon={faLightbulb}
-                      size={32}
-                      color='#2D81D2'
-                  />
-              </TouchableOpacity> */}
               <View style={[styles.bottomView, styles.torchButton]}>
                 <Button title='Toggle Torch' onPress={torchPressHandler}/>
               </View>
@@ -123,13 +112,9 @@ function BarcodeScanner({navigation}:any){
       ) : (
       <View style={styles.bottomView}>
         <Text style={styles.startText}>Press Scan Code button to start</Text>
-        {/* <Button title='scan code' color={'green'} onPress={reactivateScanner}/> */}
         <TouchableOpacity onPress={reactivateScanner}>
           <Text style={styles.scanButton}>Scan Code</Text>
         </TouchableOpacity>
-        {/* <View style={[styles.bottomView, styles.torchButton]}>
-          <Button title='Toggle Torch' onPress={torchPressHandler}/>
-        </View> */}
       </View>
       )}
       

@@ -110,10 +110,6 @@ function App({navigation}:any){
     navigation.navigate('BarcodeScanner')
   }
 
-  // const openDataUploader = () => {
-  //   navigation.navigate('DataUpload')
-  // }
-
   const saveCSV = async () => {
     // construct csvString
     const headerString = 'stockcode,qty\n';
@@ -131,7 +127,6 @@ function App({navigation}:any){
   }
 
   const loadCSV = async () => {
-    // if(await hasFolderPermissions()){
       let file = await ScopedStorage.openDocument(true, 'utf8');
 
       if(file){
@@ -144,7 +139,6 @@ function App({navigation}:any){
           ToastAndroid.show('Can only load text or CSV files',ToastAndroid.LONG)
         }
       }
-    // }
   }
 
   /**
@@ -160,29 +154,6 @@ function App({navigation}:any){
 
     return false
   }
-  // const uploadStockCodesToServer = (newServerIpAddress:string) =>{
-  //   if(updateServerIpaddress(newServerIpAddress)){
-
-  // }
-
-
-
-    // Create object with category and stockcodes
-    // Upload data to server
-  // }
-
-  // const hasFolderPermissions = async () => {
-  //   if(storeageUri !== ''){ return true }
-
-  //   let dir = await ScopedStorage.openDocumentTree(true);
-    
-  //   if(dir){
-  //     SetStorageUri(dir.uri)
-  //     return true
-  //   }
-
-  //   return false
-  // }
 
   return (
     <View style={styles.mainContainer}>
