@@ -7,12 +7,7 @@ import {
   View,
 } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons/faPenToSquare'
-import { faFloppyDisk } from '@fortawesome/free-solid-svg-icons/faFloppyDisk'
-import { faFileImport } from '@fortawesome/free-solid-svg-icons/faFileImport'
-import { faBarcode } from '@fortawesome/free-solid-svg-icons/faBarcode'
-import { faFile } from '@fortawesome/free-solid-svg-icons/faFile'
-import { faUpload } from '@fortawesome/free-solid-svg-icons/faUpload'
+import { faPenToSquare, faBarcode, faFile, faFileExport, faFileDownload, faUpload } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     toggleEditing:any
@@ -60,7 +55,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
         <View style={styles.header}>
             <TouchableOpacity style={styles.iconButtons} onPress={loadCSV}>
                 <FontAwesomeIcon
-                    icon={faFileImport}
+                    icon={faFileDownload}
                     size={32}
                     color='blue'
                 />
@@ -68,11 +63,11 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButtons} onPress={saveCSV}>
                 <FontAwesomeIcon
-                    icon={faFloppyDisk}
+                    icon={faFileExport}
                     size={32}
                     color='green'
                 />
-                <Text style={styles.buttonText}>Save</Text>
+                <Text style={styles.buttonText}>Export</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.iconButtons} onPress={editStockStockItems}>
                 <FontAwesomeIcon

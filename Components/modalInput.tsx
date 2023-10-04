@@ -82,7 +82,8 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
             stockCodeData.push(stockCodeSection(stockItem.stockCode, stockItem.quantity))
         }
         console.log("uploadStockCodesToServer function 2")
-        if(stockCodeData.length > 0){
+        if(stockCodeData.length > 0)
+        {
             fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory + '&true' , {
                 method: 'POST',
                 body: JSON.stringify(stockCodeData),
@@ -93,18 +94,15 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
             .then((resp) => resp.json())
             .then((data) => {
                 console.log("Successfully uploaded stock code data")
-                // On reply
-                // update stock items with which ones were uploaded to server
-                    // show green cloud for successful upload
                 hideModal()    
             }).catch((error) => {
                 console.log("Error uploading stockItems to server")
                 console.log(error)
-                setErrorUploadText("Error uploading stockItems to server")
+                setErrorUploadText("Error uploading stockItems to server. Check server is running and Ipaddress is correct")
             })
 
 
-            // const response = await fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory, {
+            // const response = await fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory + '&true', {
             //     method: 'POST',
             //     body: JSON.stringify(stockCodeData),
             //     headers: {
@@ -116,13 +114,12 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
 
             // if(response.ok){
             //     console.log("Successfully uploaded stock code data")
-            //     // On reply
-            //     // update stock items with which ones were uploaded to server
-            //         // show green cloud for successful upload
+            //     console.log(response.statusText)
             //     hideModal()
             // }
-            // else{
+            // else if(!response.ok){
             //     console.log("response from server NOT ok")
+            //     console.log(response.statusText)
             //     console.log(json.error)
             //     // Display the error message user
             //     setErrorUploadText(json.error)
@@ -137,7 +134,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
     const isValidInput = (string:string) => {
         if(regexIpAddress.test(string)){
           setErrorIpAddressText('')
-          setTempIpAddress('')
+        //   setTempIpAddress('')
           return true;
         }
     
@@ -172,10 +169,16 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                 if(tempIpAddress === ''){
                     uploadStockCodesToServer()
                 }
-                else { isValidInput(tempIpAddress) }
+                else if(isValidInput(tempIpAddress)){
+                    updateServerIpaddress(tempIpAddress)
+                    uploadStockCodesToServer(tempIpAddress)
+                    setTempIpAddress('')
+                }
             }
             else if(isValidInput(tempIpAddress)){
+                updateServerIpaddress(tempIpAddress)
                 uploadStockCodesToServer(tempIpAddress)
+                setTempIpAddress('')
             }
         }
         else if( tempIpAddress !== '') isValidInput(tempIpAddress)
