@@ -57,7 +57,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                 <FontAwesomeIcon
                     icon={faFileDownload}
                     size={32}
-                    color='blue'
+                    color='navy'
                 />
                 <Text style={styles.buttonText}>Load</Text>
             </TouchableOpacity>
@@ -65,7 +65,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                 <FontAwesomeIcon
                     icon={faFileExport}
                     size={32}
-                    color='green'
+                    color='#024F21'
                 />
                 <Text style={styles.buttonText}>Export</Text>
             </TouchableOpacity>
@@ -81,7 +81,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                 <FontAwesomeIcon
                     icon={faBarcode}
                     size={32}
-                    color='navy'
+                    color='blue'
                 />
                 <Text style={styles.buttonText}>Scan</Text>
             </TouchableOpacity>
@@ -89,7 +89,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                 <FontAwesomeIcon
                     icon={faFile}
                     size={32}
-                    color='#1E3050'
+                    color='green'
                 />
                 <Text style={styles.buttonText}>New</Text>
             </TouchableOpacity>
@@ -97,7 +97,7 @@ function Header({toggleEditing, toggleInputModal, openBarcodeScanner, saveCSV, l
                 <FontAwesomeIcon
                     icon={faUpload}
                     size={32}
-                    color='#1E3050'
+                    color='purple'
                 />
                 <Text style={styles.buttonText}>Upload</Text>
             </TouchableOpacity>

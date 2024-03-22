@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { Button, Modal, StyleSheet, Text, TextInput, View } from "react-native";
+import Toast from 'react-native-simple-toast';
 // import SearchableDropdown from 'react-native-searchable-dropdown';
 // import DropDownPicker from 'react-native-dropdown-picker';
 import CategoryDropdown from "./categoryDropdown";
@@ -91,10 +92,9 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
             })
             .then((resp) => resp.json())
             .then((data) => {
-                console.log("Successfully uploaded stock code data")
+                Toast.show('Stockcodes uploaded', 10);
                 hideModal()    
             }).catch((error) => {
-                console.log("Error uploading stockItems to server")
                 console.log(error)
                 setErrorUploadText("Error uploading stockItems to server. Check server is running and Ipaddress is correct")
             })
@@ -161,6 +161,10 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         setTempIpAddress('')
         toggle()
     }
+
+    // const uploadMessage = () =>{
+    //     Toast.show('Stockcodes uploaded', 10);
+    // }
 
     // const createDropdownItem = (value:string|null):dropdownItem|null => {
     //     if(!value) return null
