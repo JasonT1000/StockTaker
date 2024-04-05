@@ -25,7 +25,7 @@ function BarcodeScanner({navigation}:any){
   
   const [scanningEnabled, SetScanningEnabled] = useState(false)
   const [currentItemCode, SetCurrentItemCode] = useState('')
-  const [CurrentItemQuantity, SetCurrentItemQuantity] = useState(0)
+  const [CurrentItemQuantity, SetCurrentItemQuantity] = useState<number>(0)
   const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.off)
 
   enum TorchMode {
@@ -49,6 +49,8 @@ function BarcodeScanner({navigation}:any){
       })
 
       SetCurrentItemCode(newStockCode)
+      SetScanningEnabled(false)
+      scannerRef?.disable
   }
 
   const reactivateScanner = () => {
@@ -109,17 +111,37 @@ function BarcodeScanner({navigation}:any){
             </View>
           }
         />
-      ) : (
-      <View style={styles.bottomView}>
-        <Text style={styles.startText}>Press Scan Code button to start</Text>
-        <TouchableOpacity onPress={reactivateScanner}>
-          <Text style={styles.scanButton}>Scan Code</Text>
-        </TouchableOpacity>
-      </View>
-      )}
+      ) : 
       
+        CurrentItemQuantity > 0 ?
+          (
+            <View style={styles.parentView}>
+              <View style={styles.topViewRow}>
+                <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
+                <Text style={styles.barcodeData}>{currentItemCode}</Text>
+              </View>
+              <View style={styles.topViewRow}>
+                <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
+                <Text style={styles.barcodeData}>{CurrentItemQuantity}</Text>
+              </View>
+              <View style={styles.bottomView2}>
+                <Text style={styles.startText}>Press Scan Code button to start</Text>
+                <TouchableOpacity onPress={reactivateScanner}>
+                  <Text style={styles.scanButton}>Scan Code</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) :
+          (
+            <View style={styles.bottomView2}>
+              <Text style={styles.startText}>Press Scan Code button to start</Text>
+              <TouchableOpacity onPress={reactivateScanner}>
+                <Text style={styles.scanButton}>Scan Code</Text>
+              </TouchableOpacity>
+            </View>
+          )
+        }
     </View>
-      
   )
 }
 
@@ -168,13 +190,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'black',
   },
+  bottomView2: {
+    flex: 1,
+    marginTop: 40,
+    paddingTop: 10,
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'black',
+  },
+  parentView: {
+    flex: 1,
+    height: '100%',
+    marginTop: 10,
+    paddingTop: 10,
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: 'black',
+  },
   scanButton: {
     // flex: 1,
     fontSize: 20,
     paddingHorizontal: 20,
     paddingVertical: 10,
     backgroundColor: '#1AB329',
-    // backgroundColor: '#2D81D2',
     borderRadius: 5,
     color: 'white',
   },
