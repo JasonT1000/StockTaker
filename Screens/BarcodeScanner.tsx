@@ -7,9 +7,11 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import {
+  BackHandler,
   Button,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -25,7 +27,8 @@ function BarcodeScanner({navigation}:any){
   
   const [scanningEnabled, SetScanningEnabled] = useState(false)
   const [currentItemCode, SetCurrentItemCode] = useState('')
-  const [CurrentItemQuantity, SetCurrentItemQuantity] = useState<number>(0)
+  const [currentItemQuantity, SetCurrentItemQuantity] = useState<number>(0)
+  const [tempQuantity, setTempQuantity] = useState<string>('')
   const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.off)
 
   enum TorchMode {
@@ -34,23 +37,48 @@ function BarcodeScanner({navigation}:any){
   };
 
   useEffect(() => {
-    const updatedItem = state.stockItems.find(stockItem => stockItem.stockCode === currentItemCode)
-    if(updatedItem){
-      SetCurrentItemQuantity(updatedItem? updatedItem.quantity: 1)
+    const backAction = () => {
+      if(currentItemCode !== ''){
+        dispatch({
+          type: Types.AddManual,
+          payload: {
+            stockCode: currentItemCode,
+            quantity: currentItemQuantity
+          }
+        })
+      }
+
+      return false
     }
-  }, [state.stockItems]);
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction)
+
+    return () => backHandler.remove()
+  }, [currentItemCode, currentItemQuantity])
 
   const addStockItem = (newStockCode:string) => {
-      dispatch({
-        type: Types.Add,
-        payload: {
-          stockCode: newStockCode
-        }
-      })
+    if(newStockCode == currentItemCode){ // same stock code
+      SetCurrentItemQuantity(currentItemQuantity + 1)
+      setTempQuantity((currentItemQuantity + 1).toString())
+    }
+    else{ // different stock code
+      if(currentItemCode !== ''){ // stockcode has been set before
+        dispatch({
+          type: Types.AddManual,
+          payload: {
+            stockCode: currentItemCode,
+            quantity: currentItemQuantity
+          }
+        })
+      }
 
       SetCurrentItemCode(newStockCode)
-      SetScanningEnabled(false)
-      scannerRef?.disable
+      SetCurrentItemQuantity(1)
+      setTempQuantity((1).toString())
+    }
+    
+    SetScanningEnabled(false)
+    scannerRef?.disable
   }
 
   const reactivateScanner = () => {
@@ -72,6 +100,17 @@ function BarcodeScanner({navigation}:any){
     SetTorchMode(TorchMode.ON)
   }
 
+  const onHandleQuantityChange = (newQuantity:string) =>{
+    setTempQuantity(newQuantity)
+    if(newQuantity == '') return
+
+    SetCurrentItemQuantity(parseInt(newQuantity))
+  }
+
+  const onHandleSubmit = (event:any) =>{
+    SetCurrentItemQuantity(parseInt(event.nativeEvent.text))
+  }
+
   return (
     <View style={styles.container}>
       {scanningEnabled ? (
@@ -89,10 +128,10 @@ function BarcodeScanner({navigation}:any){
                 <Text style={styles.barcodeData}>{currentItemCode}</Text>
               </View>
               
-              {CurrentItemQuantity > 0 ?
+              {currentItemQuantity > 0 ?
                 <View style={styles.topViewRow}>
                   <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
-                  <Text style={styles.barcodeData}>{CurrentItemQuantity}</Text>
+                  <Text style={styles.barcodeData}>{currentItemQuantity}</Text>
                 </View>
                 : null }
             </View>
@@ -113,7 +152,7 @@ function BarcodeScanner({navigation}:any){
         />
       ) : 
       
-        CurrentItemQuantity > 0 ?
+        currentItemQuantity > 0 ?
           (
             <View style={styles.parentView}>
               <View style={styles.topViewRow}>
@@ -122,7 +161,13 @@ function BarcodeScanner({navigation}:any){
               </View>
               <View style={styles.topViewRow}>
                 <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
-                <Text style={styles.barcodeData}>{CurrentItemQuantity}</Text>
+                <TextInput
+                    style={styles.textInput}
+                    keyboardType='numeric'
+                    value={tempQuantity}
+                    onChangeText={onHandleQuantityChange}
+                    onSubmitEditing={submitEvent => onHandleSubmit(submitEvent)}
+                  />
               </View>
               <View style={styles.bottomView2}>
                 <Text style={styles.startText}>Press Scan Code button to start</Text>
@@ -180,11 +225,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 20,
   },
+  textInput:{
+    borderWidth: 1,
+    borderColor: '#777',
+    fontSize: 20,
+    padding: 0,
+    paddingLeft: 5,
+  },
   bottomView: {
     flex: 1,
-    // height: 300,
     marginTop: 10,
-    // marginBottom: 20,
     paddingTop: 10,
     width: '100%',
     alignItems: 'center',
@@ -209,7 +259,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   scanButton: {
-    // flex: 1,
     fontSize: 20,
     paddingHorizontal: 20,
     paddingVertical: 10,

@@ -11,6 +11,7 @@ type ActionMap<M extends { [index: string]: any}> = {
 
 export enum Types {
     Add = 'ADD_STOCKITEM',
+    AddManual = 'ADD_MANUAL_STOCKITEM', 
     Delete = 'DELETE_STOCKITEM',
     Update = 'UPDATE_STOCKITEM',
     Clear = 'CLEAR_STOCKITEMS'
@@ -26,6 +27,10 @@ type StockItemPayload = {
     [Types.Add] : {
         stockCode: string
         quantity?: number
+    },
+    [Types.AddManual] : {
+        stockCode: string
+        quantity: number
     },
     [Types.Update] : {
         quantity: number
@@ -44,6 +49,9 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
     switch (action.type){
         case Types.Add:
             return addStockItem(state, action.payload)
+
+        case Types.AddManual:
+            return addManualStockItem(state, action.payload)
             
         case Types.Update:
             return updateStockItem(state, action.payload.id, action.payload.quantity)
@@ -76,6 +84,32 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
             return { ...item,
                 stockCode: item.stockCode,
                 quantity: (item.quantity + (payload.quantity? payload.quantity : 1)),
+                id: item.id };
+            }
+            return item;
+        });
+    
+        return(newArray);
+    }
+  }
+
+  // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to passed
+  // in quantity otherwise it adds passed in quantity to an items existing quantity.
+  const addManualStockItem = (state: StockItem[], payload:{stockCode:string, quantity:number}) => {
+    let index = state.findIndex(stockItems => stockItems.stockCode === payload.stockCode)
+    if(index == -1){ // Item NOT in the stockItems
+        return([...state, {
+            stockCode: payload.stockCode,
+            quantity: payload.quantity,
+            id: payload.stockCode,
+        }])
+    }
+    else{ // Add to the existing stockItems quantity
+        const newArray = state.map((item) => {
+            if (item.stockCode === payload.stockCode) {
+            return { ...item,
+                stockCode: item.stockCode,
+                quantity: (item.quantity + payload.quantity),
                 id: item.id };
             }
             return item;
