@@ -177,7 +177,7 @@ function App({navigation}:any){
         style={styles.stockCodeInput}
         placeholder='Stockcode here'
         placeholderTextColor={'grey'}
-        autoCapitalize='none'
+        autoCapitalize='characters'
         value={inputText}
         onChangeText={SetInputText}
         onSubmitEditing={(submitEvent) => handleStockInputComponentSubmitEvent(submitEvent)}
