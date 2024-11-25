@@ -9,6 +9,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import {
   BackHandler,
   Button,
+  NativeModules,
   StyleSheet,
   Text,
   TextInput,
@@ -19,6 +20,8 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AppContext } from '../Store/stockItemContext';
 import { Types } from '../Store/reducers';
+
+const {MyNativeModule} = NativeModules;
 
 function BarcodeScanner({navigation}:any){
   const {state, dispatch} = useContext(AppContext)
@@ -82,13 +85,15 @@ function BarcodeScanner({navigation}:any){
   }
 
   const reactivateScanner = () => {
-    if(!scanningEnabled){
-      SetScanningEnabled(true)
-    }
+    console.log("about to call myMethod of ANDROID")
+    MyNativeModule.myMethod('THIS IS SENT FROM ReacNative TO ANDROID')
+    // if(!scanningEnabled){
+    //   SetScanningEnabled(true)
+    // }
 
-    if(scannerRef){
-      scannerRef.reactivate()
-    }
+    // if(scannerRef){
+    //   scannerRef.reactivate()
+    // }
   }
 
   const torchPressHandler = () =>{
