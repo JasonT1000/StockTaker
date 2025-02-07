@@ -39,7 +39,7 @@ function StockItemRow({item, isEditing, updateItem, deleteStockItem}:Props){
 
   return (
     <View style = {styles.listRow}>
-      <Text style = {styles.rowItem}>{item? item.stockCode : ''}</Text>
+      <Text style = {styles.rowItem}>{item? item.stockEan : ''}</Text>
       <Text style = {styles.rowItem}>{item? item.quantity : ''}</Text>
       {isEditing && <TextInput
         style = {[styles.rowItem, styles.rowInput]}

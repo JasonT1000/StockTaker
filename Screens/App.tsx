@@ -70,13 +70,13 @@ function App({navigation}:any){
     }
   }
 
-  const addStockItem = (newStockCode:string, quantity?:number) => {
-    if(isValidInput(newStockCode))
+  const addStockItem = (newStockEan:string, quantity?:number) => {
+    if(isValidInput(newStockEan))
     {
       dispatch({
         type: Types.Add,
         payload: {
-          stockCode: newStockCode,
+          stockEan: newStockEan,
           quantity: quantity,
         }
       })
@@ -112,8 +112,8 @@ function App({navigation}:any){
 
   const saveCSV = async () => {
     // construct csvString
-    const headerString = 'stockcode,qty\n';
-    const rowString = state.stockItems.map(stockItem => `${stockItem.stockCode},${stockItem.quantity}\n`).join('');
+    const headerString = 'stockEan,qty\n';
+    const rowString = state.stockItems.map(stockItem => `${stockItem.stockEan},${stockItem.quantity}\n`).join('');
     const csvString = `${headerString}${rowString}`;
 
     // if(await hasFolderPermissions()){
@@ -175,7 +175,7 @@ function App({navigation}:any){
       />
       <TextInput 
         style={styles.stockCodeInput}
-        placeholder='Stockcode here'
+        placeholder='StockEan here'
         placeholderTextColor={'grey'}
         autoCapitalize='characters'
         value={inputText}
@@ -186,7 +186,7 @@ function App({navigation}:any){
 
       <View style={styles.mainContentContainer}>
         <View style = {styles.listRow}>
-          <Text style={styles.rowHeading}>ItemCode</Text>
+          <Text style={styles.rowHeading}>ItemEan</Text>
           <Text style={styles.rowHeading}>Quantity</Text>
           {isEditing && <Text style={styles.rowHeading}></Text>}
         </View>

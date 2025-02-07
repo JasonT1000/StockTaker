@@ -18,6 +18,7 @@ export enum Types {
 }
 
 export type StockItem = {
+    stockEan:string
     stockCode:string
     quantity:number
     id:string
@@ -25,11 +26,11 @@ export type StockItem = {
 
 type StockItemPayload = {
     [Types.Add] : {
-        stockCode: string
+        stockEan: string
         quantity?: number
     },
     [Types.AddManual] : {
-        stockCode: string
+        stockEan: string
         quantity: number
     },
     [Types.Update] : {
@@ -69,20 +70,22 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
 
   // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to 1
   // otherwise it adds one to an items existing quantity.
-  const addStockItem = (state: StockItem[], payload:{stockCode:string, quantity?:number}) => {
-    let index = state.findIndex(stockItems => stockItems.stockCode === payload.stockCode)
+  const addStockItem = (state: StockItem[], payload:{stockEan:string, quantity?:number}) => {
+    let index = state.findIndex(stockItems => stockItems.stockEan === payload.stockEan)
     if(index == -1){ // Item NOT in the stockItems
         return([...state, {
-            stockCode: payload.stockCode,
+            stockEan: payload.stockEan,
+            stockCode: '',
             quantity: payload.quantity? payload.quantity : 1,
-            id: payload.stockCode,
+            id: payload.stockEan,
         }])
     }
     else{ // Add 1 to the existing stockItems quantity
         const newArray = state.map((item) => {
-            if (item.stockCode === payload.stockCode) {
+            if (item.stockEan === payload.stockEan) {
             return { ...item,
-                stockCode: item.stockCode,
+                stockEan: item.stockEan,
+                stockCode: '',
                 quantity: (item.quantity + (payload.quantity? payload.quantity : 1)),
                 id: item.id };
             }
@@ -95,20 +98,22 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
 
   // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to passed
   // in quantity otherwise it adds passed in quantity to an items existing quantity.
-  const addManualStockItem = (state: StockItem[], payload:{stockCode:string, quantity:number}) => {
-    let index = state.findIndex(stockItems => stockItems.stockCode === payload.stockCode)
+  const addManualStockItem = (state: StockItem[], payload:{stockEan:string, quantity:number}) => {
+    let index = state.findIndex(stockItems => stockItems.stockEan === payload.stockEan)
     if(index == -1){ // Item NOT in the stockItems
         return([...state, {
-            stockCode: payload.stockCode,
+            stockEan: payload.stockEan,
+            stockCode: '',
             quantity: payload.quantity,
-            id: payload.stockCode,
+            id: payload.stockEan,
         }])
     }
     else{ // Add to the existing stockItems quantity
         const newArray = state.map((item) => {
-            if (item.stockCode === payload.stockCode) {
+            if (item.stockEan === payload.stockEan) {
             return { ...item,
-                stockCode: item.stockCode,
+                stockEan: item.stockEan,
+                stockCode: '',
                 quantity: (item.quantity + payload.quantity),
                 id: item.id };
             }

@@ -2,6 +2,7 @@ import React, { Dispatch, createContext, useReducer } from 'react';
 import { StockItemActions, stockItemReducer } from './reducers';
 
 type StockItem = {
+  stockEan:string
   stockCode:string
   quantity:number
   id:string

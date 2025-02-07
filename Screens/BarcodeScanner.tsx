@@ -26,7 +26,7 @@ function BarcodeScanner({navigation}:any){
   let scannerRef:QRCodeScanner|null = null
   
   const [scanningEnabled, SetScanningEnabled] = useState(false)
-  const [currentItemCode, SetCurrentItemCode] = useState('')
+  const [currentItemEan, SetCurrentItemEan] = useState('')
   const [currentItemQuantity, SetCurrentItemQuantity] = useState<number>(0)
   const [tempQuantity, setTempQuantity] = useState<string>('')
   const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.off)
@@ -38,11 +38,11 @@ function BarcodeScanner({navigation}:any){
 
   useEffect(() => {
     const backAction = () => {
-      if(currentItemCode !== ''){
+      if(currentItemEan !== ''){
         dispatch({
           type: Types.AddManual,
           payload: {
-            stockCode: currentItemCode,
+            stockEan: currentItemEan,
             quantity: currentItemQuantity
           }
         })
@@ -54,25 +54,25 @@ function BarcodeScanner({navigation}:any){
     const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction)
 
     return () => backHandler.remove()
-  }, [currentItemCode, currentItemQuantity])
+  }, [currentItemEan, currentItemQuantity])
 
   const addStockItem = (newStockCode:string) => {
-    if(newStockCode == currentItemCode){ // same stock code
+    if(newStockCode == currentItemEan){ // same stock code
       SetCurrentItemQuantity(currentItemQuantity + 1)
       setTempQuantity((currentItemQuantity + 1).toString())
     }
     else{ // different stock code
-      if(currentItemCode !== ''){ // stockcode has been set before
+      if(currentItemEan !== ''){ // stockcode has been set before
         dispatch({
           type: Types.AddManual,
           payload: {
-            stockCode: currentItemCode,
+            stockEan: currentItemEan,
             quantity: currentItemQuantity
           }
         })
       }
 
-      SetCurrentItemCode(newStockCode)
+      SetCurrentItemEan(newStockCode)
       SetCurrentItemQuantity(1)
       setTempQuantity((1).toString())
     }
@@ -125,7 +125,7 @@ function BarcodeScanner({navigation}:any){
             <View style={styles.topView}>
               <View style={styles.topViewRow}>
                 <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
-                <Text style={styles.barcodeData}>{currentItemCode}</Text>
+                <Text style={styles.barcodeData}>{currentItemEan}</Text>
               </View>
               
               {currentItemQuantity > 0 ?
@@ -142,7 +142,7 @@ function BarcodeScanner({navigation}:any){
           bottomContent={
             <View style={styles.bottomView}>
               <TouchableOpacity onPress={reactivateScanner}>
-                <Text style={styles.scanButton}>Scan Code</Text>
+                <Text style={styles.scanButton}>Scan EAN</Text>
               </TouchableOpacity>
               <View style={[styles.bottomView, styles.torchButton]}>
                 <Button title='Toggle Torch' onPress={torchPressHandler}/>
@@ -157,7 +157,7 @@ function BarcodeScanner({navigation}:any){
             <View style={styles.parentView}>
               <View style={styles.topViewRow}>
                 <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
-                <Text style={styles.barcodeData}>{currentItemCode}</Text>
+                <Text style={styles.barcodeData}>{currentItemEan}</Text>
               </View>
               <View style={styles.topViewRow}>
                 <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
@@ -170,18 +170,18 @@ function BarcodeScanner({navigation}:any){
                   />
               </View>
               <View style={styles.bottomView2}>
-                <Text style={styles.startText}>Press Scan Code button to start</Text>
+                <Text style={styles.startText}>Press Scan EAN button to start</Text>
                 <TouchableOpacity onPress={reactivateScanner}>
-                  <Text style={styles.scanButton}>Scan Code</Text>
+                  <Text style={styles.scanButton}>Scan EAN</Text>
                 </TouchableOpacity>
               </View>
             </View>
           ) :
           (
             <View style={styles.bottomView2}>
-              <Text style={styles.startText}>Press Scan Code button to start</Text>
+              <Text style={styles.startText}>Press Scan EAN button to start</Text>
               <TouchableOpacity onPress={reactivateScanner}>
-                <Text style={styles.scanButton}>Scan Code</Text>
+                <Text style={styles.scanButton}>Scan EAN</Text>
               </TouchableOpacity>
             </View>
           )

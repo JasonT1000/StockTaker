@@ -68,8 +68,9 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         let ipAddress = serverIpAddress
         if(updatedIpAddress) ipAddress = updatedIpAddress
 
-        let stockCodeSection = (stockCode: string, stockQuantity: number) => {
+        let stockCodeSection = (stockEan: string, stockCode: string, stockQuantity: number) => {
             return {
+                stockEan: stockEan,
                 stockCode: stockCode,
                 stockQuantity: stockQuantity
             }
@@ -78,7 +79,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         let stockCodeData = []
 
         for (const stockItem of state.stockItems) {
-            stockCodeData.push(stockCodeSection(stockItem.stockCode, stockItem.quantity))
+            stockCodeData.push(stockCodeSection(stockItem.stockEan, stockItem.stockCode, stockItem.quantity))
         }
         console.log("uploadStockCodesToServer function 2")
         if(stockCodeData.length > 0)
