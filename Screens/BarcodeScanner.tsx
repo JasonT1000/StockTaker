@@ -231,6 +231,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 0,
     paddingLeft: 5,
+    color: 'white'
   },
   bottomView: {
     flex: 1,
