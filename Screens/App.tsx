@@ -18,22 +18,28 @@ import * as ScopedStorage from "react-native-scoped-storage"
 import Header from "../Components/header";
 import StockItemRow from '../Components/stockItemRow';
 import { AppContext } from '../Store/stockItemContext';
-import { Types, StockItem } from '../Store/reducers';
+import { Types } from '../Store/reducers';
 import { displayFileContents } from '../customFunctions';
 import ModalInput from '../Components/modalInput';
+import useDatabase from '../Hooks/useDatabase';
 
 
 function App({navigation}:any){
+  // State
   const [inputText, SetInputText] = useState('')
   const [errorText, SetErrorText] = useState('')
 
   const [isEditing, SetIsEditing] = useState(false)
   const [storeageUri, SetStorageUri] = useState('')
 
-  const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
+  // const [serverIpAddress, setServerIpAddress] = useState<null|string>(null)
   const [isModalVisible, setIsModalVisible] = useState(false)
 
+  // Context
   const {state, dispatch} = useContext(AppContext)
+
+  // Hooks
+  const { checkEANExistsInDatabase } = useDatabase()
 
   const ErrorMessage = Object.freeze({
     Short: 'That stockcode is not long enough',
@@ -44,8 +50,17 @@ function App({navigation}:any){
     SetIsEditing(canEdit)
   }
 
+  const handleStockInputChangeEvent = (changedText:string) => {
+    SetInputText(changedText);
+    if(errorText === ''){ return }
+    SetErrorText('')
+  }
+
   const handleStockInputComponentSubmitEvent = (event:any) =>{
-    addStockItem(event.nativeEvent.text)
+    if(isValidInput(event.nativeEvent.text))
+    {
+      addStockEan(event.nativeEvent.text)
+    }
   }
 
   const isValidInput = (string:string) => {
@@ -61,6 +76,24 @@ function App({navigation}:any){
     return false;
   }
 
+  /**
+   * Checks if passed in stockEAN exists in database before adding it to stocktake.
+   * Displays error message if doesn't exist.
+   * @param stockEAN EAN number to add
+   */
+  const addStockEan = async (stockEAN:string) =>{
+    let stockInfo = await checkEANExistsInDatabase(stockEAN)
+
+    if(stockInfo){
+      if(stockInfo.stockCode !== ''){
+        addStockItem(stockEAN, stockInfo.stockCode)
+      }
+      else{
+        SetErrorText(stockInfo.errorText)
+      }
+    }
+  }
+
   const handleErrorText = (string:string) => {
     const regex = /^.{0,3}$/;
     SetErrorText(ErrorMessage.Illegal)
@@ -70,13 +103,15 @@ function App({navigation}:any){
     }
   }
 
-  const addStockItem = (newStockEan:string, quantity?:number) => {
+  // This function is called for every item in a saved stocktake. Could be problematic
+  const addStockItem = (newStockEan:string, newStockCode:string, quantity?:number) => {
     if(isValidInput(newStockEan))
     {
       dispatch({
         type: Types.Add,
         payload: {
           stockEan: newStockEan,
+          stockCode: newStockCode,
           quantity: quantity,
         }
       })
@@ -112,8 +147,8 @@ function App({navigation}:any){
 
   const saveCSV = async () => {
     // construct csvString
-    const headerString = 'stockEan,qty\n';
-    const rowString = state.stockItems.map(stockItem => `${stockItem.stockEan},${stockItem.quantity}\n`).join('');
+    const headerString = 'stockEan,stockCode,qty\n';
+    const rowString = state.stockItems.map(stockItem => `${stockItem.stockEan},${stockItem.stockCode},${stockItem.quantity}\n`).join('');
     const csvString = `${headerString}${rowString}`;
 
     // if(await hasFolderPermissions()){
@@ -146,14 +181,14 @@ function App({navigation}:any){
    * @param newServerIpAddress 
    * @returns {boolean} true if server IpAddress was updated else false
    */
-  const updateServerIpaddress = (newServerIpAddress:string):boolean => {
-    if(newServerIpAddress !== ''){ //Update ipaddress if new
-      setServerIpAddress(newServerIpAddress)
-      return true
-    }
+  // const updateServerIpaddress = (newServerIpAddress:string):boolean => {
+  //   if(newServerIpAddress !== ''){ //Update ipaddress if new
+  //     setServerIpAddress(newServerIpAddress)
+  //     return true
+  //   }
 
-    return false
-  }
+  //   return false
+  // }
 
   return (
     <View style={styles.mainContainer}>
@@ -169,8 +204,8 @@ function App({navigation}:any){
       <ModalInput
         visible={isModalVisible}
         toggle={() => setIsModalVisible(!isModalVisible)}
-        serverIpAddress={serverIpAddress}
-        updateServerIpaddress={updateServerIpaddress}
+        // serverIpAddress={serverIpAddress}
+        // updateServerIpaddress={updateServerIpaddress}
         // uploadStockCodesToServer={uploadStockCodesToServer}
       />
       <TextInput 
@@ -179,16 +214,18 @@ function App({navigation}:any){
         placeholderTextColor={'grey'}
         autoCapitalize='characters'
         value={inputText}
-        onChangeText={SetInputText}
+        onChangeText={(changedText) => handleStockInputChangeEvent(changedText)}
+        // onChangeText={SetInputText}
         onSubmitEditing={(submitEvent) => handleStockInputComponentSubmitEvent(submitEvent)}
       />
       {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
 
       <View style={styles.mainContentContainer}>
         <View style = {styles.listRow}>
-          <Text style={styles.rowHeading}>ItemEan</Text>
-          <Text style={styles.rowHeading}>Quantity</Text>
-          {isEditing && <Text style={styles.rowHeading}></Text>}
+          <Text style={styles.rowHeadingOne}>Ean</Text>
+          <Text style={styles.rowHeadingTwo}>Code</Text>
+          <Text style={styles.rowHeadingThree}>Qty</Text>
+          {isEditing && <Text style={styles.rowHeadingThree}></Text>}
         </View>
         <View style={styles.listContainer}>
           <FlatList
@@ -229,10 +266,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 0,
   },
-  rowHeading:{
+  rowHeadingOne:{
+    flex: 3,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    height: 40,
+    fontSize: 21,
+    color: 'white',
+  },
+  rowHeadingTwo:{
+    flex: 3,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    height: 40,
+    fontSize: 21,
+    color: 'white',
+  },
+  rowHeadingThree:{
     flex: 1,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'right',
     height: 40,
     fontSize: 21,
     color: 'white',

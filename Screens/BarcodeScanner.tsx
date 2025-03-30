@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useContext, useEffect, useState } from 'react';
 import {
   BackHandler,
@@ -19,17 +12,26 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AppContext } from '../Store/stockItemContext';
 import { Types } from '../Store/reducers';
+import useDatabase from '../Hooks/useDatabase';
 
 function BarcodeScanner({navigation}:any){
+  // Context
   const {state, dispatch} = useContext(AppContext)
 
+  // Refs
   let scannerRef:QRCodeScanner|null = null
   
+  // State
   const [scanningEnabled, SetScanningEnabled] = useState(false)
   const [currentItemEan, SetCurrentItemEan] = useState('')
+  const [currentItemStockCode, SetCurrentItemStockCode] = useState('')
   const [currentItemQuantity, SetCurrentItemQuantity] = useState<number>(0)
   const [tempQuantity, setTempQuantity] = useState<string>('')
   const [torchMode, SetTorchMode] = useState(RNCamera.Constants.FlashMode.off)
+  const [errorText, SetErrorText] = useState('')
+
+  // Hooks
+  const { checkEANExistsInDatabase } = useDatabase()
 
   enum TorchMode {
     ON = RNCamera.Constants.FlashMode.torch,
@@ -43,6 +45,7 @@ function BarcodeScanner({navigation}:any){
           type: Types.AddManual,
           payload: {
             stockEan: currentItemEan,
+            stockCode: currentItemStockCode,
             quantity: currentItemQuantity
           }
         })
@@ -56,8 +59,10 @@ function BarcodeScanner({navigation}:any){
     return () => backHandler.remove()
   }, [currentItemEan, currentItemQuantity])
 
-  const addStockItem = (newStockCode:string) => {
-    if(newStockCode == currentItemEan){ // same stock code
+  const addStockItem = (newStockEAN:string) => {
+    // Check ean exists in database
+
+    if(newStockEAN == currentItemEan){ // same stock code
       SetCurrentItemQuantity(currentItemQuantity + 1)
       setTempQuantity((currentItemQuantity + 1).toString())
     }
@@ -67,18 +72,34 @@ function BarcodeScanner({navigation}:any){
           type: Types.AddManual,
           payload: {
             stockEan: currentItemEan,
+            stockCode: currentItemStockCode,
             quantity: currentItemQuantity
           }
         })
       }
 
-      SetCurrentItemEan(newStockCode)
-      SetCurrentItemQuantity(1)
-      setTempQuantity((1).toString())
+      checkStockEanExistsOnDatabase(newStockEAN)
     }
     
     SetScanningEnabled(false)
     scannerRef?.disable
+  }
+
+  const checkStockEanExistsOnDatabase = async (newStockEAN:string) => {
+    let stockInfo = await checkEANExistsInDatabase(newStockEAN)
+
+    if(stockInfo){
+      console.log(stockInfo)
+      if(stockInfo.stockCode !== ''){ // stockEAN exists in backend database
+        SetCurrentItemEan(newStockEAN)
+        SetCurrentItemStockCode(stockInfo.stockCode)
+        SetCurrentItemQuantity(1)
+        setTempQuantity((1).toString())
+      }
+      else{
+        SetErrorText(newStockEAN + " " + stockInfo.errorText)
+      }
+    }
   }
 
   const reactivateScanner = () => {
@@ -176,13 +197,15 @@ function BarcodeScanner({navigation}:any){
                 </TouchableOpacity>
               </View>
             </View>
-          ) :
+          )
+          :
           (
             <View style={styles.bottomView2}>
               <Text style={styles.startText}>Press Scan EAN button to start</Text>
               <TouchableOpacity onPress={reactivateScanner}>
                 <Text style={styles.scanButton}>Scan EAN</Text>
               </TouchableOpacity>
+              {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
             </View>
           )
         }

@@ -5,12 +5,13 @@ import Toast from 'react-native-simple-toast';
 // import DropDownPicker from 'react-native-dropdown-picker';
 import CategoryDropdown from "./categoryDropdown";
 import { AppContext } from "../Store/stockItemContext";
+import { SettingsActionContext, TypesSettingsAction } from "../Store/settingsContext";
 
 interface Props {
     visible:boolean
     toggle:Function
-    serverIpAddress:null|string
-    updateServerIpaddress:(newServerIpAddress:string) => boolean
+    // serverIpAddress:null|string
+    // updateServerIpaddress:(newServerIpAddress:string) => boolean
 }
 
 export type dropdownItem = {
@@ -18,9 +19,12 @@ export type dropdownItem = {
     value: string
 }
 
-const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:Props) => {
+const ModalInput = ({ visible, toggle}:Props) => {
+    // Context
     const {state, dispatch} = useContext(AppContext)
+    const {stateSettingsAction, dispatchSettingsAction} = useContext(SettingsActionContext)
     
+    // State
     const [tempIpAddress, setTempIpAddress] = useState<string>('')
     const [stockCategories, setStockCategories] = useState<dropdownItem[]>([{label: 'None', value: 'None'}])
     const [selectedCategory, setSelectedCategory] = useState<string>('')
@@ -28,26 +32,27 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
     const [errorCategoryText, setErrorCategoryText] = useState<null|string>('')
     const [errorUploadText, setErrorUploadText] = useState<null|string>('')
 
+    // Refs
     const firstUpdate = useRef(true);
 
     const regexIpAddress = /^((\d){1,3}\.){3}(\d){1,3}$/
 
     useEffect(() => {
-        if(serverIpAddress) loadStockCategories()
-    }, [serverIpAddress])
+        if(stateSettingsAction.serverIpAddress !== '') { loadStockCategories() }
+    }, [stateSettingsAction.serverIpAddress])
 
     useEffect(() => { // On first load dont show empty category error message
-        if(firstUpdate.current && serverIpAddress){
+        if(firstUpdate.current && stateSettingsAction.serverIpAddress !== ''){
             firstUpdate.current = false;
         }
-        else if(serverIpAddress){
+        else if(stateSettingsAction.serverIpAddress !== ''){
             isValidCategory()
         }
     }, [selectedCategory])
 
     const loadStockCategories = async () => {
 
-        fetch('http://' + serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",})
+        fetch('http://' + stateSettingsAction.serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",})
         .then((resp) => resp.json())
         .then((data) => {
             let newCategories: dropdownItem[] = []
@@ -64,9 +69,21 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
         })
     }
 
+    const updateServerIpaddress = (newServerIpAddress:string) => {
+        dispatchSettingsAction({
+            type: TypesSettingsAction.SetServerIpAddress,
+            payload: { 
+                ipAddress: newServerIpAddress
+            }
+        })
+    }
+
     const uploadStockCodesToServer = async (updatedIpAddress?:string) => {
-        let ipAddress = serverIpAddress
-        if(updatedIpAddress) ipAddress = updatedIpAddress
+        let ipAddress = stateSettingsAction.serverIpAddress
+        if(updatedIpAddress){
+            // ipAddress = updatedIpAddress
+            updateServerIpaddress(ipAddress)
+        }
 
         let stockCodeSection = (stockEan: string, stockCode: string, stockQuantity: number) => {
             return {
@@ -129,6 +146,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
 
     const onSubmitIpAddress = () => {
         if(isValidInput(tempIpAddress)){
+            console.log("@@@@@@@@@@@@@@@@@@@@@ About to update ip address @@@@@@@@@@@@@@@@@@@@@")
             updateServerIpaddress(tempIpAddress)
         }
     }
@@ -138,7 +156,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
 
         if(isValidCategory())
         {
-            if(serverIpAddress)
+            if(stateSettingsAction.serverIpAddress !== '')
             {
                 if(tempIpAddress === ''){
                     uploadStockCodesToServer()
@@ -180,11 +198,11 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
             <View style={styles.modalContainer}>
                 <View style={styles.modalContent}>
                     <Text style={styles.modalTextTitle}>Upload stockCodes to server</Text>
-                    {serverIpAddress?
+                    {stateSettingsAction.serverIpAddress !== ''?
                         <>
                             <View style={styles.ipaddressContentContainer}>
                                 <Text style={styles.modalTextLabel}>Current server IpAddress:</Text>
-                                <Text style={styles.modalText}>{serverIpAddress}</Text>
+                                <Text style={styles.modalText}>{stateSettingsAction.serverIpAddress}</Text>
 
                                 <Text style={styles.modalTextLabel}>Change server IpAddress:</Text>
                                 <TextInput
@@ -227,7 +245,7 @@ const ModalInput = ({ visible, toggle, serverIpAddress, updateServerIpaddress}:P
                     </View>
                     <View style={styles.modalButtonContainer}>
                         <Button title="Cancel" onPress={hideModal} />
-                        { serverIpAddress? 
+                        { stateSettingsAction.serverIpAddress !== '' ? 
                             <Button title={"Upload"} onPress={onSubmit} />
                             :
                             <Button title={"Set IpAddress"} onPress={onSubmitIpAddress} />

@@ -27,10 +27,12 @@ export type StockItem = {
 type StockItemPayload = {
     [Types.Add] : {
         stockEan: string
+        stockCode: string
         quantity?: number
     },
     [Types.AddManual] : {
         stockEan: string
+        stockCode: string
         quantity: number
     },
     [Types.Update] : {
@@ -70,12 +72,12 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
 
   // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to 1
   // otherwise it adds one to an items existing quantity.
-  const addStockItem = (state: StockItem[], payload:{stockEan:string, quantity?:number}) => {
+  const addStockItem = (state: StockItem[], payload:{stockEan:string, stockCode:string, quantity?:number}) => {
     let index = state.findIndex(stockItems => stockItems.stockEan === payload.stockEan)
     if(index == -1){ // Item NOT in the stockItems
         return([...state, {
             stockEan: payload.stockEan,
-            stockCode: '',
+            stockCode: payload.stockCode,
             quantity: payload.quantity? payload.quantity : 1,
             id: payload.stockEan,
         }])
@@ -85,7 +87,7 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
             if (item.stockEan === payload.stockEan) {
             return { ...item,
                 stockEan: item.stockEan,
-                stockCode: '',
+                stockCode: item.stockCode,
                 quantity: (item.quantity + (payload.quantity? payload.quantity : 1)),
                 id: item.id };
             }
@@ -98,12 +100,12 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
 
   // Adds a stock item to the state store. If the item doesnt exist it sets its quantity to passed
   // in quantity otherwise it adds passed in quantity to an items existing quantity.
-  const addManualStockItem = (state: StockItem[], payload:{stockEan:string, quantity:number}) => {
+  const addManualStockItem = (state: StockItem[], payload:{stockEan:string, stockCode:string, quantity:number}) => {
     let index = state.findIndex(stockItems => stockItems.stockEan === payload.stockEan)
     if(index == -1){ // Item NOT in the stockItems
         return([...state, {
             stockEan: payload.stockEan,
-            stockCode: '',
+            stockCode: payload.stockCode,
             quantity: payload.quantity,
             id: payload.stockEan,
         }])
@@ -113,7 +115,7 @@ export const stockItemReducer = (state: StockItem[], action: StockItemActions) =
             if (item.stockEan === payload.stockEan) {
             return { ...item,
                 stockEan: item.stockEan,
-                stockCode: '',
+                stockCode: item.stockCode,
                 quantity: (item.quantity + payload.quantity),
                 id: item.id };
             }

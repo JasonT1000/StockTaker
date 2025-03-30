@@ -39,16 +39,17 @@ function StockItemRow({item, isEditing, updateItem, deleteStockItem}:Props){
 
   return (
     <View style = {styles.listRow}>
-      <Text style = {styles.rowItem}>{item? item.stockEan : ''}</Text>
-      <Text style = {styles.rowItem}>{item? item.quantity : ''}</Text>
+      <Text style = {styles.rowItemOne}>{item? item.stockEan : ''}</Text>
+      <Text style = {styles.rowItemTwo}>{item? item.stockCode : ''}</Text>
+      <Text style = {isEditing? styles.rowItemFour : styles.rowItemThree}>{item? item.quantity : ''}</Text>
       {isEditing && <TextInput
-        style = {[styles.rowItem, styles.rowInput]}
+        style = {[styles.rowItemThree, styles.rowInput]}
         inputMode ='numeric'
         value={inputText}
         onChangeText={SetInputText}
         onSubmitEditing={submitEvent => handleStockInputComponentSubmitEvent(submitEvent, item.id)}
       />}
-      {isEditing && <TouchableOpacity style={[styles.rowItem, styles.deleteButton]} onPress={() => deleteStockItem(item.id)}>
+      {isEditing && <TouchableOpacity style={[styles.rowItemThree, styles.deleteButton]} onPress={() => deleteStockItem(item.id)}>
         <FontAwesomeIcon
             icon={faTrash}
             size={24}
@@ -64,11 +65,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flex: 1,
   },
-  rowItem:{
-    flex: 2,
+  rowItemOne:{
+    flex: 3,
     fontSize: 18,
     marginTop: 18,
-    textAlign: 'center',
+    paddingRight: 5,
+    textAlign: 'left',
+    color: 'white',
+  },
+  rowItemTwo:{
+    flex: 3,
+    fontSize: 18,
+    marginTop: 18,
+    paddingHorizontal: 5,
+    textAlign: 'left',
+    color: 'white',
+  },
+  rowItemThree:{
+    flex: 1,
+    fontSize: 18,
+    marginTop: 18,
+    textAlign: 'right',
+    color: 'white',
+  },
+  rowItemFour:{
+    flex: 1,
+    fontSize: 18,
+    marginTop: 18,
+    paddingRight: 5,
+    textAlign: 'right',
     color: 'white',
   },
   rowInput:{
