@@ -59,6 +59,10 @@ function BarcodeScanner({navigation}:any){
     return () => backHandler.remove()
   }, [currentItemEan, currentItemQuantity])
 
+  /**
+   * Adds scanned EAN to stocktake the disables camera scanner.
+   * @param newStockEAN new EAN scanned
+   */
   const addStockItem = (newStockEAN:string) => {
     // Check ean exists in database
 
@@ -85,18 +89,28 @@ function BarcodeScanner({navigation}:any){
     scannerRef?.disable
   }
 
+  /**
+   * Checks scanned EAN exists in stockData database.
+   * If it does it will set it as current item. If not reset current item states.
+   * @param newStockEAN 
+   */
   const checkStockEanExistsOnDatabase = (newStockEAN:string) => {
     let stockInfo = checkEANExistsInDatabase(newStockEAN)
 
-    if(stockInfo){
-      console.log(stockInfo)
+    if(stockInfo)
+    {
       if(stockInfo.stockCode !== ''){ // stockEAN exists in backend database
         SetCurrentItemEan(newStockEAN)
         SetCurrentItemStockCode(stockInfo.stockCode)
         SetCurrentItemQuantity(1)
         setTempQuantity((1).toString())
       }
-      else{
+      else{ // stockEAN doesn't exist in backend database
+        SetCurrentItemEan('')
+        SetCurrentItemStockCode('')
+        SetCurrentItemQuantity(0)
+        setTempQuantity('')
+
         SetErrorText(stockInfo.errorText)
       }
     }
@@ -171,14 +185,18 @@ function BarcodeScanner({navigation}:any){
             </View>
           }
         />
-      ) : 
-      
+      )
+      : 
         currentItemQuantity > 0 ?
           (
             <View style={styles.parentView}>
               <View style={styles.topViewRow}>
-                <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
+                <Text style={[styles.barcodeData, styles.topViewHeading]}>EAN: </Text>
                 <Text style={styles.barcodeData}>{currentItemEan}</Text>
+              </View>
+              <View style={styles.topViewRow}>
+                <Text style={[styles.barcodeData, styles.topViewHeading]}>StockCode: </Text>
+                <Text style={styles.barcodeData}>{currentItemStockCode}</Text>
               </View>
               <View style={styles.topViewRow}>
                 <Text style={[styles.barcodeData, styles.topViewHeading]}>Quantity: </Text>
@@ -234,7 +252,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     marginVertical: 10,
     width: '100%',
-    alignItems: 'center',
   },
   topViewRow: {
     flexDirection: 'row',

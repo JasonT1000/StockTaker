@@ -120,7 +120,6 @@ const ModalInput = ({ visible, toggle}:Props) => {
                 Toast.show('Stockcodes uploaded', 10);
                 hideModal()    
             }).catch((error) => {
-                console.log(error)
                 setErrorUploadText("Error uploading stockItems to server. Check server is running and Ipaddress is correct")
             })
         }
