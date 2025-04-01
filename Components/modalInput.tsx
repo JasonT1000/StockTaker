@@ -6,6 +6,7 @@ import Toast from 'react-native-simple-toast';
 import CategoryDropdown from "./categoryDropdown";
 import { AppContext } from "../Store/stockItemContext";
 import { SettingsActionContext, TypesSettingsAction } from "../Store/settingsContext";
+import useDatabase from "../Hooks/useDatabase";
 
 interface Props {
     visible:boolean
@@ -32,13 +33,19 @@ const ModalInput = ({ visible, toggle}:Props) => {
     const [errorCategoryText, setErrorCategoryText] = useState<null|string>('')
     const [errorUploadText, setErrorUploadText] = useState<null|string>('')
 
+    // Hooks
+    const { getStockItemsDataFromDatabase } = useDatabase()
+
     // Refs
     const firstUpdate = useRef(true);
 
     const regexIpAddress = /^((\d){1,3}\.){3}(\d){1,3}$/
 
     useEffect(() => {
-        if(stateSettingsAction.serverIpAddress !== '') { loadStockCategories() }
+        if(stateSettingsAction.serverIpAddress !== ''){
+            loadStockCategories()
+            getStockItemsDataFromDatabase()
+        }
     }, [stateSettingsAction.serverIpAddress])
 
     useEffect(() => { // On first load dont show empty category error message
@@ -52,7 +59,7 @@ const ModalInput = ({ visible, toggle}:Props) => {
 
     const loadStockCategories = async () => {
 
-        fetch('http://' + stateSettingsAction.serverIpAddress + ':4000/api/stockcodes/categories', {method: "GET",})
+        fetch('http://' + stateSettingsAction.serverIpAddress + ':4000/api/stockcodes/categories/', {method: "GET",})
         .then((resp) => resp.json())
         .then((data) => {
             let newCategories: dropdownItem[] = []
@@ -98,7 +105,7 @@ const ModalInput = ({ visible, toggle}:Props) => {
         for (const stockItem of state.stockItems) {
             stockCodeData.push(stockCodeSection(stockItem.stockEan, stockItem.stockCode, stockItem.quantity))
         }
-        console.log("uploadStockCodesToServer function 2")
+        
         if(stockCodeData.length > 0)
         {
             fetch('http://' + ipAddress + ':4000/api/stockcodes/' + selectedCategory + '&true' , {
@@ -146,7 +153,6 @@ const ModalInput = ({ visible, toggle}:Props) => {
 
     const onSubmitIpAddress = () => {
         if(isValidInput(tempIpAddress)){
-            console.log("@@@@@@@@@@@@@@@@@@@@@ About to update ip address @@@@@@@@@@@@@@@@@@@@@")
             updateServerIpaddress(tempIpAddress)
         }
     }

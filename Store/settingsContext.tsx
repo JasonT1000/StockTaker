@@ -1,11 +1,14 @@
 import { createContext, Dispatch, useMemo, useReducer } from "react";
+import { StockItemData } from "../types";
 
 type InitialStateType = {
     serverIpAddress: string
+    stockItemsData: StockItemData[]
 }
 
 const initialState = {
-    serverIpAddress: ''
+    serverIpAddress: '',
+    stockItemsData: []
 }
 
 const SettingsActionContext = createContext<{
@@ -21,10 +24,10 @@ const SettingsActionContext = createContext<{
 const AppProvider2 = ({ children }:{ children:React.ReactNode}) => {
     const [stateSettingsAction, dispatchSettingsAction] = useReducer(settingsActionReducer, initialState)
 
-    const contexValue = useMemo(() => ({
-        stateSettingsAction,
-        dispatchSettingsAction,
-    }), [stateSettingsAction, dispatchSettingsAction])
+    // const contexValue = useMemo(() => ({
+    //     stateSettingsAction,
+    //     dispatchSettingsAction,
+    // }), [stateSettingsAction, dispatchSettingsAction])
 
     return (
         <SettingsActionContext.Provider value={{stateSettingsAction, dispatchSettingsAction}}>
@@ -45,12 +48,16 @@ type ActionMap<M extends { [index: string]: any}> = {
   }
 
 export enum TypesSettingsAction {
-    SetServerIpAddress = 'SET_SERVERIPADDRESS'
+    SetServerIpAddress = 'SET_SERVERIPADDRESS',
+    SetStockItemsData = 'SET_STOCKITEMSDATA'
 }
 
 type SettingsActionPayload = {
     [TypesSettingsAction.SetServerIpAddress] : {
         ipAddress: string
+    }
+    [TypesSettingsAction.SetStockItemsData] : {
+        stockItemsData: StockItemData[]
     }
 }
 
@@ -68,7 +75,9 @@ const settingsActionReducer = (stateSettingsAction: InitialStateType, action: se
                 console.error("invalid payload for SetServerIpAddress action")
             }
             break;
-    
+        case TypesSettingsAction.SetStockItemsData:
+            newState.stockItemsData = JSON.parse(JSON.stringify(action.payload.stockItemsData))
+            break;
         default:
             return stateSettingsAction
     }

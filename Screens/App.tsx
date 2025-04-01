@@ -64,7 +64,7 @@ function App({navigation}:any){
   }
 
   const isValidInput = (string:string) => {
-    const regex = /^[^!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s]*[\w/+]{4,}[^!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s_]*$/;
+    const regex = /^[^!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s]*[\w/+]{3,}[^!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?\s_]*$/;
 
     if(regex.test(string)){
       SetErrorText('')
@@ -81,8 +81,8 @@ function App({navigation}:any){
    * Displays error message if doesn't exist.
    * @param stockEAN EAN number to add
    */
-  const addStockEan = async (stockEAN:string) =>{
-    let stockInfo = await checkEANExistsInDatabase(stockEAN)
+  const addStockEan = (stockEAN:string) =>{
+    let stockInfo = checkEANExistsInDatabase(stockEAN)
 
     if(stockInfo){
       if(stockInfo.stockCode !== ''){
@@ -95,7 +95,7 @@ function App({navigation}:any){
   }
 
   const handleErrorText = (string:string) => {
-    const regex = /^.{0,3}$/;
+    const regex = /^.{0,2}$/;
     SetErrorText(ErrorMessage.Illegal)
 
     if(regex.test(string)){

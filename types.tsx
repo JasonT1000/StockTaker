@@ -4,3 +4,8 @@ export interface StockItem{
     quantity: number;
     id: string;
 }
+
+export interface StockItemData{
+    ean: string,
+    productCode: string
+}

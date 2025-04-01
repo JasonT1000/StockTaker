@@ -85,8 +85,8 @@ function BarcodeScanner({navigation}:any){
     scannerRef?.disable
   }
 
-  const checkStockEanExistsOnDatabase = async (newStockEAN:string) => {
-    let stockInfo = await checkEANExistsInDatabase(newStockEAN)
+  const checkStockEanExistsOnDatabase = (newStockEAN:string) => {
+    let stockInfo = checkEANExistsInDatabase(newStockEAN)
 
     if(stockInfo){
       console.log(stockInfo)
@@ -97,7 +97,7 @@ function BarcodeScanner({navigation}:any){
         setTempQuantity((1).toString())
       }
       else{
-        SetErrorText(newStockEAN + " " + stockInfo.errorText)
+        SetErrorText(stockInfo.errorText)
       }
     }
   }
@@ -145,7 +145,7 @@ function BarcodeScanner({navigation}:any){
           topContent={
             <View style={styles.topView}>
               <View style={styles.topViewRow}>
-                <Text style={[styles.barcodeData, styles.topViewHeading]}>Barcode: </Text>
+                <Text style={[styles.barcodeData, styles.topViewHeading]}>EAN: </Text>
                 <Text style={styles.barcodeData}>{currentItemEan}</Text>
               </View>
               
@@ -205,7 +205,7 @@ function BarcodeScanner({navigation}:any){
               <TouchableOpacity onPress={reactivateScanner}>
                 <Text style={styles.scanButton}>Scan EAN</Text>
               </TouchableOpacity>
-              {errorText ? <Text style={{ color: 'red' }}>{errorText}</Text> : null}
+              {errorText ? <Text style={{ color: 'red', textAlign: 'center' }}>{errorText}</Text> : null}
             </View>
           )
         }
